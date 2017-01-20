@@ -5,74 +5,68 @@
 *
 *	See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
+#pragma once
 
-
-#ifndef AAAC_HPP_INCLUDE_GUARD_K7763KDIOXBK2
-#define AAAC_HPP_INCLUDE_GUARD_K7763KDIOXBK2
-
+#include <array>
 #include <vector>
-#include "aarq.hpp"
 
+#include "aarq.hpp"
+#include "Types.hpp"
 
 namespace dicom
 {
-	//!message primitives, as described in Part 8, section 9
-	namespace primitive
-	{
+  //!message primitives, as described in Part 8, section 9
+  namespace primitive
+  {
+    /*!
+    Defined in Part 8, table 9-18
+    */
+    struct PresentationContextAccept
+    {
+      static const BYTE m_itemType = 0x21;
+      static const BYTE m_reserved1 = 0x00;
+      static const BYTE m_reserved2 = 0x00;
+      static const BYTE m_reserved4 = 0x00;
 
-		/*!
-		Defined in Part 8, table 9-18
-		*/
-		struct	PresentationContextAccept
-		{
+      BYTE m_result;
+      BYTE m_presentationContextID;
 
-			static const BYTE				ItemType_=0x21;
-			static const BYTE				Reserved1_=0x00;
-			//UINT16							Length_;
-			BYTE							PresentationContextID_;
-			static const BYTE				Reserved2_=0x00;
-			BYTE							Result_;
-			static const BYTE				Reserved4_=0x00;
-		
-			TransferSyntax				TrnSyntax_;
-			PresentationContextAccept();
-			//PresentationContextAccept(TransferSyntax &);
+      TransferSyntax m_trnSyntax;
 
-			void		Write(Network::Socket &);
-			UINT32		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT16		Size();
-		};
-		
+      PresentationContextAccept();
 
-		//!Should document where this is defined
-		class	AAssociateAC
-		{
-		private:
-			static const BYTE		ItemType_= 0x02;
-			static const BYTE		Reserved1_=0x00;;
-			static const UINT16	ProtocolVersion_	= 0x01;
-			static const UINT16	Reserved2_		=0x00;
-		public:
+      void write(Network::Socket&);
+      UINT32 read(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT16 size();
+    };
 
-			std::string CalledAppTitle_;
-			std::string CallingAppTitle_;
-			BYTE		Reserved3_[32];
-			ApplicationContext					AppContext_;
-			std::vector<PresentationContextAccept>	PresContextAccepts_;
-			UserInformation						UserInfo_;
-		public:
+    //!Should document where this is defined
+    class AAssociateAC
+    {
+      static const BYTE m_itemType = 0x02;
+      static const BYTE m_reserved1 = 0x00;
+      static const UINT16 m_protocolVersion = 0x01;
+      static const UINT16 m_reserved2 = 0x00;
 
-			AAssociateAC();
-			AAssociateAC(const std::string& CallingApp,const std::string& CalledApp);
+    public:
 
-			void		SetUserInformation(UserInformation &);
-			void		Write(Network::Socket &);
-			UINT32		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32		Size();
-		};			
-	}//namespace primitive
+      std::string m_calledAppTitle;
+      std::string m_callingAppTitle;
+      std::array<BYTE, 32> m_reserved3;
+      
+      ApplicationContext m_appContext;
+      std::vector<PresentationContextAccept> m_presContextAccepts;
+      UserInformation m_userInfo;
+
+      AAssociateAC();
+      AAssociateAC(const std::string& callingApp, const std::string& calledApp);
+
+      void setUserInformation(UserInformation&);
+      void write(Network::Socket&);
+      UINT32 read(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
+  }//namespace primitive
 }//namespace dicom
-
-#endif //AAAC_HPP_INCLUDE_GUARD_K7763KDIOXBK2
