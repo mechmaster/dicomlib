@@ -11,7 +11,7 @@
 
 #include "lib/dicomlib.hpp"
 
-#include <FL/Fl.H>
+//#include <FL/Fl.H>
 
 /*
 	modify these constants as appropriate for your environment
