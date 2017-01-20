@@ -1,8 +1,12 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign.hpp>
 #include <boost/format.hpp>
+
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <iostream>
 #include <chrono>
@@ -11,19 +15,28 @@
 
 #include "lib/dicomlib.hpp"
 
-#include <FL/Fl.H>
+//#include <FL/Fl.H>
 
 /*
 	modify these constants as appropriate for your environment
 */
 
-const std::string host = "192.168.3.148";
+//const std::string host = "192.168.3.148";
+//const std::string local_AE = "mechgrad";
+//const std::string remote_AE = "ORTHANC";
+//const short remote_port = 4242;		//standard dicom port
+
+const std::string host = "127.0.0.1";
 const std::string local_AE = "mechgrad";
-const std::string remote_AE = "ORTHANC";
-const short remote_port = 4242;		//standard dicom port
+const std::string remote_AE = "Dicoogle";
+const short remote_port = 1045;		//standard dicom port
 
 unsigned int count = 0;
 std::chrono::duration<double> elapsed_seconds;
+
+std::vector<dicom::DataSet> dicomList;
+
+boost::recursive_mutex lockmutex;
 
 namespace demo
 {
@@ -71,6 +84,11 @@ namespace demo
 		std::vector<unsigned short> PixelData;
 
 		data(dicom::TAG_PIXEL_DATA) >> PixelData;
+        
+        {
+          boost::unique_lock<boost::recursive_mutex> lock(lockmutex);
+          dicomList.push_back(data);
+        }
 	}
 
 	void ConnectToRemoteServer()
@@ -111,7 +129,7 @@ namespace demo
 		Instruct the pacs server to send the set of images belonging to
         a given study to another DICOM application entity
 	*/
-	void DoCMove()
+	bool DoCMove()
 	{
 		dicom::PresentationContexts presentation_contexts;
 		presentation_contexts.Add(dicom::STUDY_ROOT_QR_MOVE_SOP_CLASS);
@@ -120,11 +138,11 @@ namespace demo
 		dicom::ClientConnection connection(host,remote_port,local_AE,remote_AE,presentation_contexts);
 		
         static unsigned int count = 0;
-        static std::vector<std::string> UID_list = boost::assign::list_of ("1.2.392.200036.9116.2.6.1.48.1214242831.1408519596.617924")
+        static std::vector<std::string> UID_list = boost::assign::list_of /*("1.2.392.200036.9116.2.6.1.48.1214242831.1408519596.617924")*/
         ("1.2.392.200036.9116.2.6.1.48.1214242831.1408519682.959652")
         ("1.2.392.200036.9116.2.6.1.48.1214242831.1408519696.253333")
         ("1.2.392.200036.9116.2.6.1.48.1214242831.1408520084.921691")
-        ("1.2.392.200036.9116.2.6.1.48.1214242831.1408520181.188813");
+        /*("1.2.392.200036.9116.2.6.1.48.1214242831.1408520181.188813")*/;
         
 		//make CMove request
 		dicom::DataSet request;
@@ -137,7 +155,7 @@ namespace demo
         }
 		request.Put<dicom::VR_UI>(dicom::TAG_SERIES_INST_UID,dicom::UID(UID_list[count]));
         
-        std::string  serverWorkingDirectory("/home/chif/.local/share/SamSMU/pacs/dicom/");
+        std::string  serverWorkingDirectory("/home/chif/.local/share/SamSMU/pacs/temp/");
         boost::filesystem::path path(serverWorkingDirectory);
         if (boost::filesystem::exists(path)) {
           std::vector<std::string> deletePathList;
@@ -152,13 +170,13 @@ namespace demo
           }
 
           for (unsigned int i = 0; i < deletePathList.size(); ++i) {
-            boost::filesystem::remove(deletePathList[i]);
+            boost::filesystem::remove_all(deletePathList[i]);
           }
         }
         else {
           std::cout << boost::str(boost::format("Fatal error! path=%s not exists.") % serverWorkingDirectory) << std::endl;
 
-          return;
+          return false;
         }
 
         try
@@ -172,18 +190,74 @@ namespace demo
           std::string msg = e.what();
           std::cout << msg << std::endl;
         }
+
+        if (boost::filesystem::exists(path)) {
+          int cnt = std::count_if(
+            boost::filesystem::directory_iterator(serverWorkingDirectory),
+            boost::filesystem::directory_iterator(),
+            bind(static_cast<bool(*)(const boost::filesystem::path&)>(boost::filesystem::is_regular_file), 
+              bind(&boost::filesystem::directory_entry::path, _1)));
+          
+          std::cout << "File count = " << cnt << std::endl;
+          
+          return cnt;
+        }
+        
+        return true;
 	}
 }//namespace demo
+
+void threadFunc(const std::string dicomDir)
+{
+  boost::filesystem::recursive_directory_iterator dir(dicomDir), end;
+  while (dir != end)
+  {
+    boost::filesystem::path path = dir->path();
+    
+    std::cout << "path = " << path.string() << std::endl;
+    
+    if (boost::filesystem::is_regular_file(path))
+    {
+      try
+      {
+        demo::OpenDataSet(dir->path().string());
+      }
+      catch (...)
+      {
+      }
+    }
+    
+    ++dir;
+  }
+}
+
+void loadDicomDirectory(const std::string& dicomDir)
+{
+  boost::filesystem::directory_iterator dir(dicomDir), end;
+  
+  while (dir != end)
+  {
+    boost::filesystem::path path = dir->path();
+    std::cout << "path = " << path.string() << std::endl;
+    
+    if (boost::filesystem::is_directory(path))
+    {
+      boost::thread thread = boost::thread(boost::bind(&threadFunc, path.string()));
+    }
+
+    ++dir;
+  }
+}
 
 int main(int, char**)
 {
   //Fl::scheme("gtk+");
   //Fl::lock();
   //Fl::run();
-	//const std::string dicomDir="/home/chif/Patients/";			//modify this as appropriate
+	//const std::string dicomDir="/home/chif/Patients/0295/Berezhnoi_PV_331416/";			//modify this as appropriate
 
-    const std::string dicomDir="/home/chif/Patients/0026_STRUEVA/dicom/S60_anon/";
-    //const std::string dicomDir="/home/chif/Patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/Зверев/";
+    //const std::string dicomDir="/home/chif/Patients/0026_STRUEVA/dicom/S60_anon/";
+  const std::string dicomDir="/home/chif/Patients/";
   
     std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
     startTime = std::chrono::system_clock::now();
@@ -218,6 +292,8 @@ int main(int, char**)
           
           ++dir;
         }*/
+        
+        loadDicomDirectory(dicomDir);
 
         std::cout << std::endl << "Attempting to connect to the remote server at " << host << ":" << remote_port << std::endl;
 		//demo::ConnectToRemoteServer();
@@ -225,24 +301,35 @@ int main(int, char**)
         std::cout <<  std::endl << "Attempting to query the remote server..." << std::endl;
 		//demo::QueryRemoteServer();
       
-        for (unsigned int i = 0; i < 100; ++i)
+        /*for (unsigned int i = 0; i < 100; ++i)
         {
           std::cout <<  std::endl << "Attempting to move DICOM..." << std::endl;
-          demo::DoCMove();
-        }
+          bool res = demo::DoCMove();
+          
+          if (!res)
+          {
+            std::cout << "Test failed" << std::endl;
+            break;
+          }
+        }*/
 	}
 	catch(std::exception& e)
 	{
       std::string msg = e.what();
       std::cout << msg << std::endl;
 	}
-        
-    std::cout << "file count = " << count << std::endl;
+	
+	while (true)
+    {
+      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    }
+
+    //std::cout << "file count = " << count << std::endl;
     
-    endTime = std::chrono::system_clock::now();
-    elapsed_seconds = endTime - startTime;
+    //endTime = std::chrono::system_clock::now();
+    //elapsed_seconds = endTime - startTime;
     
-    std::cout << "elapsed time: " << elapsed_seconds.count() << std::endl;
+    //std::cout << "elapsed time: " << elapsed_seconds.count() << std::endl;
   
 	return 0;
 }
