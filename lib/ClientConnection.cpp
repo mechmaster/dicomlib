@@ -86,7 +86,7 @@ namespace dicom
 		case	0x02:
 			{
 				AAssociateAC acknowledgement;
-				acknowledgement.ReadDynamic (*socket_);
+				acknowledgement.readDynamic(*socket_);
 
 				if(!InterogateAAssociateAC(acknowledgement))
 				{
@@ -144,7 +144,7 @@ namespace dicom
 
 	bool IsBad(PresentationContextAccept& PCA)
 	{
-		return (PCA.Result_!=0);
+		return (PCA.m_result != 0);
 	}
 
 	/*!
@@ -154,14 +154,14 @@ namespace dicom
 	bool ClientConnection::InterogateAAssociateAC(AAssociateAC& acknowledgement)
 	{
 		//"Accepted" means feed back from remote server. Not necessary "result is 0" -Sam
-		AcceptedPresentationContexts_=acknowledgement.PresContextAccepts_;
+		AcceptedPresentationContexts_=acknowledgement.m_presContextAccepts;
 		//AcceptedPresentationContexts_.clear();
 
 
         
-        AcceptedPresentationContexts_ = acknowledgement.PresContextAccepts_;
+        AcceptedPresentationContexts_ = acknowledgement.m_presContextAccepts;
 
-        int unaccepted = std::count_if(acknowledgement.PresContextAccepts_.begin(),acknowledgement.PresContextAccepts_.end(),IsBad);
+        int unaccepted = std::count_if(acknowledgement.m_presContextAccepts.begin(),acknowledgement.m_presContextAccepts.end(),IsBad);
         return (AcceptedPresentationContexts_.size()>unaccepted);
 
 	}

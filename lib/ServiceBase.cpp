@@ -352,7 +352,7 @@ namespace dicom
 		{
 			const PresentationContext& PresContext = PCArray.at ( Index );
 			const PresentationContextAccept& APresContext = AcceptedPresentationContexts_.at( Index );
-			if(PresContext.AbsSyntax_.UID_ == uid && APresContext.Result_==0)//The first accepted PresID ever found -Sam
+			if(PresContext.AbsSyntax_.UID_ == uid && APresContext.m_result == 0)//The first accepted PresID ever found -Sam
 				return (PresContext.ID_);
 			++Index;
 		}
@@ -386,10 +386,10 @@ namespace dicom
 				{
 
 					PCA = AcceptedPresentationContexts_.at ( Index );
-					if(PCA.TrnSyntax_.UID_ == TrnUID &&
-						PCA.PresentationContextID_ == PresContext.ID_)
+					if(PCA.m_trnSyntax.UID_ == TrnUID &&
+						PCA.m_presentationContextID == PresContext.ID_)
 					{
-						return ( PCA.PresentationContextID_);
+						return ( PCA.m_presentationContextID);
 					}
 					++Index;
 				}
@@ -429,8 +429,8 @@ namespace dicom
 		typedef std::vector<primitive::PresentationContextAccept>::const_iterator Iter;
 		
 		for(Iter I=AcceptedPresentationContexts_.begin();I!=AcceptedPresentationContexts_.end();I++)
-			if(I->PresentationContextID_==PresentationContextID)
-				return I->TrnSyntax_.UID_;
+			if(I->m_presentationContextID == PresentationContextID)
+				return I->m_trnSyntax.UID_;
 		throw std::runtime_error("Couldn't identify Presentation Context");
 	}
 

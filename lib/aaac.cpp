@@ -156,7 +156,11 @@ namespace dicom
       socket.Sendn<BYTE>(&m_reserved3[0], m_reserved3.size());
       m_appContext.Write(socket);
 
-      std::for_each(m_presContextAccepts.begin(),m_presContextAccepts.end(), WriteToSocket(socket));
+      std::vector<PresentationContextAccept>::iterator iter = m_presContextAccepts.begin();
+      for (; iter != m_presContextAccepts.end(); ++iter)
+      {
+        iter->write(socket);
+      }
 
       m_userInfo.Write(socket);
     }
@@ -176,8 +180,8 @@ namespace dicom
 
     UINT32 AAssociateAC::readDynamic(Network::Socket& socket)
     {
-      UINT32 byteread=0;
-      UINT32 tmp_read=0;
+      UINT32 byteread = 0;
+      UINT32 tmp_read = 0;
 
       BYTE TempByte;
 
