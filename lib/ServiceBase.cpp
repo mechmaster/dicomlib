@@ -206,11 +206,11 @@ namespace dicom
 			case	0x05:	// A-RELEASE-RQ
 				{
 					AReleaseRQ release_request;
-					release_request.ReadDynamic(*socket);
+					release_request.readDynamic(*socket);
 
 					// also drop
 					AReleaseRP release_response;
-					release_response.Write(*socket);
+					release_response.write(*socket);
 					return false;
 				}
 				// 			case	0x06:	// A-RELEASE-RP//shouldn't happen for a server
@@ -224,7 +224,7 @@ namespace dicom
 			default:
 				{
 					AAbortRQ abort_request(AAbortRQ::DICOM_SERVICE_PROVIDER,AAbortRQ::UNRECOGNIZED_PDU);
-					abort_request.Write (*socket);
+					abort_request.write(*socket);
 					throw BadItemType(ItemType,0);
 				}
 			}

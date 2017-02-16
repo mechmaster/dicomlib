@@ -20,200 +20,172 @@ has already been read from the data stream, (hence the PDU type is known.)
 ************************************************************************/
 namespace dicom
 {
-	namespace primitive
-	{
+  namespace primitive
+  {
 #ifndef _MSC_VER
-		/*
-		difference of opinion here between gcc and msvc as to whether constant static members
-		need to be instantiated seperately.
-		*/
-		const BYTE AAssociateRJ::ItemType_;
-		const BYTE AAssociateRJ::Reserved1_;
-		const UINT32 AAssociateRJ::Length_;
-		const BYTE AAssociateRJ::Reserved2_;
+    /*
+    difference of opinion here between gcc and msvc as to whether constant static members
+    need to be instantiated seperately.
+    */
+    const BYTE AAssociateRJ::m_itemType;
+    const BYTE AAssociateRJ::m_reserved1;
+    const UINT32 AAssociateRJ::m_length;
+    const BYTE AAssociateRJ::m_reserved2;
 
-		const BYTE AReleaseRQ::ItemType_;
-		const BYTE AReleaseRQ::Reserved1_;
-		const UINT32 AReleaseRQ::Length_;
-		const UINT32 AReleaseRQ::Reserved2_;
+    const BYTE AReleaseRQ::m_itemType;
+    const BYTE AReleaseRQ::m_reserved1;
+    const UINT32 AReleaseRQ::m_length;
+    const UINT32 AReleaseRQ::m_reserved2;
 
-		const BYTE AReleaseRP::ItemType_;
-		const BYTE AReleaseRP::Reserved1_;
-		const UINT32 AReleaseRP::Length_;
-		const UINT32 AReleaseRP::Reserved2_;
+    const BYTE AReleaseRP::m_itemType;
+    const BYTE AReleaseRP::m_reserved1;
+    const UINT32 AReleaseRP::m_length;
+    const UINT32 AReleaseRP::m_reserved2;
 
-		const BYTE AAbortRQ::ItemType_;
-		const BYTE AAbortRQ::Reserved1_;
-		const UINT32 AAbortRQ::Length_;
-		const BYTE AAbortRQ::Reserved2_;
-		const BYTE AAbortRQ::Reserved3_;
+    const BYTE AAbortRQ::m_itemType;
+    const BYTE AAbortRQ::m_reserved1;
+    const UINT32 AAbortRQ::m_length;
+    const BYTE AAbortRQ::m_reserved2;
+    const BYTE AAbortRQ::m_reserved3;
 #endif
 
+    namespace
+    {
+      BYTE tmpBYTE;
+      UINT32 tmpUINT32;
+    }
+
+    AAssociateRJ::AAssociateRJ(BYTE Result, BYTE Source, BYTE Reason) :
+      m_result(Result),
+      m_source(Source),
+      m_reason(Reason)
+    {
+    }
+
+    AAssociateRJ::AAssociateRJ()
+    {
+    }
 
 
+    void AAssociateRJ::write(Network::Socket& socket)
+    {
+      socket << m_itemType;
+      socket << m_reserved1;
+      socket << m_length;
+      socket << m_reserved2;
+      socket << m_result;
+      socket << m_source;
+      socket << m_reason;
+    }
 
+    void AAssociateRJ::readDynamic(Network::Socket& socket)
+    {
+      socket >> tmpBYTE; // m_itemType;
+      socket >> tmpBYTE; // m_reserved1;
+      socket >> tmpUINT32; // m_length;
+      socket >> tmpBYTE; // m_reserved2;
+      socket >> m_result;
+      socket >> m_source;
+      socket >> m_reason;
+    }
 
+    /************************************************************************
+    *
+    * AReleaseRQ Packet
+    *
+    ************************************************************************/
 
-		namespace
-		{
-			BYTE tmpBYTE;
-			UINT32 tmpUINT32;
-		}
-		AAssociateRJ::AAssociateRJ(BYTE Result, BYTE Source, BYTE Reason)
-			:
-		Result_(Result),
-			Source_(Source),
-			Reason_(Reason)
-		{
-		}
+    void AReleaseRQ::write(Network::Socket& socket)
+    {
+      socket << m_itemType;
+      socket << m_reserved1;
+      socket << m_length;
+      socket << m_reserved2;
+    }
 
+    /*!
+    Section 8, table 9.3.7
+    */
+    void AReleaseRQ::readDynamic(Network::Socket& socket)
+    {
+      socket >> tmpBYTE;
+      socket >> tmpUINT32;//should be 4 but we don't bother checking.
+      socket >> tmpUINT32;
+    }
 
-		AAssociateRJ::AAssociateRJ()
-		{}
+    /************************************************************************
+    *
+    * AReleaseRP Packet
+    *
+    ************************************************************************/
 
+    void AReleaseRP::write(Network::Socket& socket)
+    {
+      socket << m_itemType;
+      socket << m_reserved1;
+      socket << m_length;
+      socket << m_reserved2;
+    }
 
-		void AAssociateRJ::Write(Network::Socket& socket)
-		{
-			socket << ItemType_;
-			socket << Reserved1_;
-			socket << Length_;
-			socket << Reserved2_;
-			socket << Result_;
-			socket << Source_;
-			socket << Reason_;
-		}
+    void AReleaseRP::read(Network::Socket& socket)
+    {
+      BYTE b;
+      socket >> b;
+      EnforceItemType(b, m_itemType);
+      readDynamic(socket);
+    }
 
-		// 	void	AAssociateRJ::Read(Network::Socket	&socket)
-		// 	{
-		// 		socket.Readn((BYTE *) &ItemType_, sizeof(BYTE));
-		// 		ReadDynamic(socket);
-		// 	}
+    void AReleaseRP::readDynamic(Network::Socket& socket)
+    {
+      socket >> tmpBYTE;
+      socket >> tmpUINT32;
+      socket >> tmpUINT32;
+    }
 
-		void AAssociateRJ::ReadDynamic(Network::Socket& socket)
-		{
-			socket >> tmpBYTE;
-			socket >> tmpUINT32;
-			socket >> tmpBYTE;
-			socket >> Result_;
-			socket >> Source_;
-			socket >> Reason_;
-		}
+    /************************************************************************
+    *
+    * AAbortRQ Packet
+    *
+    ************************************************************************/
 
+    /*
+    in most other cases, we first create the object and then
+    call ReadDynamic(Socket&) on it.  It would be better
+    to combine the two operations into one constructor as
+    follows.  
+    */
 
+    AAbortRQ::AAbortRQ(Network::Socket& socket)
+    {
+      //must have already read ItemType_ from stream!
+      readDynamic(socket);
+    }
 
-		/************************************************************************
-		*
-		* AReleaseRQ Packet
-		*
-		************************************************************************/
+    AAbortRQ::AAbortRQ(BYTE Source, BYTE Reason) :
+      m_source(Source),
+      m_reason(Reason)
+    {
+    }
 
+    void AAbortRQ::write(Network::Socket& socket)
+    {
+      socket << m_itemType;
+      socket << m_reserved1;
+      socket << m_length;
+      socket << m_reserved2;
+      socket << m_reserved3;
+      socket << m_source;
+      socket << m_reason;
+    }
 
-
-
-		void AReleaseRQ::Write(Network::Socket& socket)
-		{
-			socket << ItemType_;
-			socket << Reserved1_;
-			socket << Length_;
-			socket << Reserved2_;
-
-		}
-
-		// 	void	AReleaseRQ	::	Read(Network::Socket	&socket)
-		// 	{
-		// 		socket >> ItemType_;
-		// 		ReadDynamic(socket);
-		// 	}
-
-		/*!
-		Section 8, table 9.3.7
-		*/
-		void AReleaseRQ::ReadDynamic(Network::Socket& socket)
-		{
-			socket >> tmpBYTE;
-			socket >> tmpUINT32;//should be 4 but we don't bother checking.
-			socket >> tmpUINT32;
-
-		}
-
-		/************************************************************************
-		*
-		* AReleaseRP Packet
-		*
-		************************************************************************/
-
-
-
-		void AReleaseRP::Write(Network::Socket& socket)
-		{
-
-			socket << ItemType_;
-			socket << Reserved1_;
-			socket << Length_;
-			socket << Reserved2_;
-
-		}
-
-		void AReleaseRP::Read(Network::Socket& socket)
-		{
-			BYTE b;
-			socket >> b;
-			EnforceItemType(b,ItemType_);
-			this->ReadDynamic(socket);
-		}
-
-		void AReleaseRP::ReadDynamic(Network::Socket& socket)
-		{
-			socket >> tmpBYTE;
-			socket >> tmpUINT32;
-			socket >> tmpUINT32;
-		}
-
-
-
-		/************************************************************************
-		*
-		* AAbortRQ Packet
-		*
-		************************************************************************/
-
-		/*
-			in most other cases, we first create the object and then
-			call ReadDynamic(Socket&) on it.  It would be better
-			to combine the two operations into one constructor as
-			follows.  
-		*/
-
-		AAbortRQ::AAbortRQ(Network::Socket& socket)
-		{
-			//must have already read ItemType_ from stream!
-			ReadDynamic(socket);
-		}
-
-		AAbortRQ::AAbortRQ(BYTE Source, BYTE Reason)
-			:Source_(Source),Reason_(Reason)
-		{
-		}
-
-		void AAbortRQ::Write(Network::Socket& socket)
-		{
-			socket << ItemType_;
-			socket << Reserved1_;
-			socket << Length_;
-			socket << Reserved2_;
-			socket << Reserved3_;
-			socket << Source_;
-			socket << Reason_;
-		}
-
-		void AAbortRQ::ReadDynamic(Network::Socket	&socket)
-		{
-			socket >> tmpBYTE;
-			socket >> tmpUINT32;
-			socket >> tmpBYTE;
-			socket >> tmpBYTE;
-			socket >> Source_;
-			socket >> Reason_;
-		}
-	}//namespace primitive
+    void AAbortRQ::readDynamic(Network::Socket& socket)
+    {
+      socket >> tmpBYTE;
+      socket >> tmpUINT32;
+      socket >> tmpBYTE;
+      socket >> tmpBYTE;
+      socket >> m_source;
+      socket >> m_reason;
+    }
+  }//namespace primitive
 }//namespace dicom

@@ -98,8 +98,8 @@ namespace dicom
 			{
 
 				AAssociateRJ rejection;
-				rejection.ReadDynamic(*socket_);
-				throw AssociationRejection(rejection.Result_,rejection.Source_,rejection.Reason_);
+				rejection.readDynamic(*socket_);
+				throw AssociationRejection(rejection.m_result,rejection.m_source,rejection.m_reason);
 			}
 		default:
 
@@ -125,9 +125,9 @@ namespace dicom
 		try
 		{
 			AReleaseRQ release_request;
-			release_request.Write(*socket_);
+			release_request.write(*socket_);
 			AReleaseRP response;
-			response.Read(*socket_);//should we do anything with this?
+			response.read(*socket_);//should we do anything with this?
 		}
 		catch(std::exception& e)
 		{
