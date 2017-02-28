@@ -70,7 +70,7 @@ namespace dicom
 
 		dicom::WriteToBuffer(ds,buffer,ts);
 
-		UINT32 MaxPDULength=AAssociateRQ_.UserInfo_.MaxSubLength_.MaximumLength_;
+		UINT32 MaxPDULength = AAssociateRQ_.m_userInfo.m_maxSubLength.m_maximumLength;
 		Write(buffer,msgHead,/*PresentationContextID*/CurrentPresentationContextID_,MaxPDULength);
 	}
 
@@ -343,7 +343,7 @@ namespace dicom
 	{
 		//shouldn't we just be interested in accepted presentation contexts?-Trevor
 		//But AcceptedPresentationContexts_ does not contain UID. -Sam
-		const vector<PresentationContext>&	PCArray = AAssociateRQ_.ProposedPresentationContexts_;
+		const vector<PresentationContext>&	PCArray = AAssociateRQ_.m_proposedPresentationContexts;
 		//const vector<PresentationContext>& PCArray=AcceptedPresentationContexts_;
 		
 		
@@ -352,8 +352,8 @@ namespace dicom
 		{
 			const PresentationContext& PresContext = PCArray.at ( Index );
 			const PresentationContextAccept& APresContext = AcceptedPresentationContexts_.at( Index );
-			if(PresContext.AbsSyntax_.UID_ == uid && APresContext.m_result == 0)//The first accepted PresID ever found -Sam
-				return (PresContext.ID_);
+			if(PresContext.m_AbsSyntax.m_UID == uid && APresContext.m_result == 0)//The first accepted PresID ever found -Sam
+				return (PresContext.m_ID);
 			++Index;
 		}
 		//	we could replace above with a call to find_if ???
@@ -374,11 +374,11 @@ namespace dicom
 
 		//shouldn't we just be interested in accepted presentation contexts?
 		
-		while ( Index < AAssociateRQ_.ProposedPresentationContexts_.size())
+		while ( Index < AAssociateRQ_.m_proposedPresentationContexts.size())
 		{
-			PresentationContext	PresContext = AAssociateRQ_.ProposedPresentationContexts_.at ( Index );
+			PresentationContext	PresContext = AAssociateRQ_.m_proposedPresentationContexts.at(Index);
 			
-			if(PresContext.AbsSyntax_.UID_ == AbsUID)
+			if(PresContext.m_AbsSyntax.m_UID == AbsUID)
 			{
 				PresentationContextAccept	PCA;
 				size_t Index = 0;
@@ -386,8 +386,8 @@ namespace dicom
 				{
 
 					PCA = AcceptedPresentationContexts_.at ( Index );
-					if(PCA.m_trnSyntax.UID_ == TrnUID &&
-						PCA.m_presentationContextID == PresContext.ID_)
+					if(PCA.m_trnSyntax.m_UID == TrnUID &&
+						PCA.m_presentationContextID == PresContext.m_ID)
 					{
 						return ( PCA.m_presentationContextID);
 					}
@@ -430,7 +430,7 @@ namespace dicom
 		
 		for(Iter I=AcceptedPresentationContexts_.begin();I!=AcceptedPresentationContexts_.end();I++)
 			if(I->m_presentationContextID == PresentationContextID)
-				return I->m_trnSyntax.UID_;
+				return I->m_trnSyntax.m_UID;
 		throw std::runtime_error("Couldn't identify Presentation Context");
 	}
 

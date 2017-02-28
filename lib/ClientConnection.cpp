@@ -46,8 +46,8 @@ namespace dicom
 		AAssociateRQ& association_request=AAssociateRQ_;//BAD BAD BAD
 
 
-		association_request.CallingAppTitle_=LocalAET;
-		association_request.CalledAppTitle_=RemoteAET;
+		association_request.m_callingAppTitle = LocalAET;
+		association_request.m_calledAppTitle = RemoteAET;
 
 		//If we get this far, we have a valid TCP/IP connection,
 		//so now negotiate the association...
@@ -62,20 +62,20 @@ namespace dicom
 			which ones it likes and sends us back a list.
 		*/
 
-		association_request.ProposedPresentationContexts_=ProposedPresentationContexts;//expensive copy operation!
+		association_request.m_proposedPresentationContexts = ProposedPresentationContexts;//expensive copy operation!
 
 
 		//last bit to do is:
 		UserInformation UserInfo;
 		MaximumSubLength MaxSubLength;
-		MaxSubLength.Set(16384);	// we can do all DICOM can handle???
-		UserInfo.ImpClass_.UID_=ImplementationClassUID;
-		UserInfo.ImpVersion_.Name=ImplementationVersionName;
-		UserInfo.SetMax(MaxSubLength);
+		MaxSubLength.set(16384);	// we can do all DICOM can handle???
+		UserInfo.m_impClass.m_UID = ImplementationClassUID;
+		UserInfo.m_impVersion.m_name = ImplementationVersionName;
+		UserInfo.setMax(MaxSubLength);
 
-		association_request.SetUserInformation ( UserInfo );
+		association_request.setUserInformation(UserInfo);
 
-		association_request.Write(*socket_);
+		association_request.write(*socket_);
 
 		//examine response from server.
 		BYTE ItemType;

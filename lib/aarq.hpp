@@ -6,8 +6,8 @@
 *	See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
-#ifndef AARQ_INCLUDE_GUARD_7UD3489IDU83
-#define AARQ_INCLUDE_GUARD_7UD3489IDU83
+#pragma once
+
 /*
 	I'd like to pull most of these classes out into individual files,
 	so I can actually find the damn things when I want them.
@@ -38,303 +38,282 @@
 
 */
 
+#include <array>
+#include <string>
+#include <vector>
+
 #include "UID.hpp"
 #include "Types.hpp"
 #include "socket/Socket.hpp"
-#include <string>
 
 /*
 * PDU Service Classes:
 *	A-ASSOCIATE-RQ Class.
 */
-#include <vector>
+
 namespace dicom
 {
+  //!Thrown if we get fed a PDU we're not expecting.
+  struct BadItemType : public dicom::exception
+  {
+    //!What was provided.
+    BYTE m_item;
+    //!What should have been provided, or 0 if unknown.
+    BYTE m_expected;
 
+    BadItemType(BYTE Item, BYTE Expected) :
+      dicom::exception("Bad Item Type"),
+      m_item(Item),
+      m_expected(Expected)
+    {
+    }
+  };
 
-	//!Thrown if we get fed a PDU we're not expecting.
-	struct BadItemType : public dicom::exception
-	{
-		//!What was provided.
-		BYTE Item_;
-		//!What should have been provided, or 0 if unknown.
-		BYTE Expected_;
+  //!Throws BadItemType if Given is not equal to Expected
+  void EnforceItemType(BYTE Given, BYTE Expected);
 
-		BadItemType(BYTE Item,BYTE Expected):dicom::exception("Bad Item Type")
-			,Item_(Item),Expected_(Expected)
-		{}
-	};
+  namespace primitive
+  {
+    /*!
+    Defined in Part 8, table 9-12
+    */
+    struct ApplicationContext
+    {
+      static const BYTE m_itemType = 0x10;
+      static const BYTE m_reserved = 0x00;
 
-	//!Throws BadItemType if Given is not equal to Expected
-	void EnforceItemType(BYTE Given, BYTE Expected);
+      UID m_UID;
 
+      ApplicationContext(const UID&);
 
-	namespace primitive
-	{
-	/*!
-		Defined in Part 8, table 9-12
-	*/
-		struct	ApplicationContext
-		{
-			static const BYTE ItemType_ = 0x10;
-			static const BYTE Reserved_=0x00;
-			UID UID_;
-		public:
+      UINT32 readDynamic(Network::Socket& socket);
+      void write(Network::Socket& socket) const;
+      UINT32 size() const;
+    };
 
-			ApplicationContext(const UID &);
-			UINT32 ReadDynamic(Network::Socket& socket);
-			void Write(Network::Socket& socket)const;
-			UINT32 Size()const;
-		};
+    /*!
+    Defined in Part 8, table 9-14
+    */
+    struct AbstractSyntax
+    {
+      static const BYTE m_itemType = 0x30;
+      static const BYTE m_reserved = 0x00;
 
-	
-	/*!
-		Defined in Part 8, table 9-14
-	*/
-		struct	AbstractSyntax
-		{
-			static const BYTE ItemType_ = 0x30;
-			static const BYTE Reserved_ = 0x00;
+      UID m_UID;
 
-			UID UID_;
-		public:
+      AbstractSyntax(const UID &);
 
-			AbstractSyntax(const UID &);
+      void set(const UID&);
+      void write(Network::Socket&);
+      UINT32 read(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
 
-			void		Set(const UID	&);
-			void		Write(Network::Socket &);
-			UINT32		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32	Size();
-		};
+    /*
+    *	What is the functional overlap between this class and the one named "TS"??
+    *	This is the 'message' that gets exchanged along the wire.  'TS' is our internal
+    *	representation of the Transfer Syntax concept.
+    */
+    /*!
+    Defined in Part 8, table 9-15
+    */
+    struct TransferSyntax
+    {
+      static const BYTE m_itemType = 0x40;
+      static const BYTE m_reserved = 0x00;
 
-		/*
-		*	What is the functional overlap between this class and the one named "TS"??
-		*	This is the 'message' that gets exchanged along the wire.  'TS' is our internal
-		*	representation of the Transfer Syntax concept.
-		*/
-		/*!
-			Defined in Part 8, table 9-15
-		*/
-		struct TransferSyntax
-		{
-			static const BYTE ItemType_ = 0x40;
-			static const BYTE Reserved_=0x00;
+      UID m_UID;
 
-			UID UID_;
+      TransferSyntax(const UID&);
 
-		public:
+      void set(const UID&);
+      void write(Network::Socket&);
+      UINT32 read(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
 
-			TransferSyntax(const UID &);
+    //!Identifies an implementation by unique identifier
+    /*!
+    Defined in Part 7, table D.3-2
+    */
+    struct ImplementationClass
+    {
+      static const BYTE m_itemType = 0x52;
+      static const BYTE m_reserved = 0x00;
 
-			void		Set(const UID	&);
-			void		Write(Network::Socket &);
- 			UINT32		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32		Size();
+      UID m_UID;
 
-		};
-		//!Identifies an implementation by unique identifier
-		/*!
-			Defined in Part 7, table D.3-2
-		*/
-		struct ImplementationClass
-		{
-			static const BYTE ItemType_ = 0x52;
-			static const BYTE Reserved_ = 0x00;
+      ImplementationClass(const UID&);
+      UINT32 readDynamic(Network::Socket& socket);
+      void write(Network::Socket& socket);
+      UINT32 size();
+    };
 
-			UID UID_;
+    //!Identifies a particuler imlementation by name
+    /*!
+    Documented in Part 7, Annex D.3.3.2.3, especially
+    table D.3-3
+    */
+    struct ImplementationVersion
+    {
+      static const BYTE m_itemType = 0x55;
+      static const BYTE m_reserved = 0x00;
 
+      std::string m_name;//May be 1 to 16 characters long.
 
+      UINT32 readDynamic(Network::Socket& socket);
+      void write(Network::Socket& socket);
+      UINT32 size();
+    };
 
-			ImplementationClass(const UID &);
-			UINT32 ReadDynamic(Network::Socket& socket);
-			void Write(Network::Socket& socket);
-			UINT32 Size();
-		};
-		//!Identifies a particuler imlementation by name
-		/*!
-			Documented in Part 7, Annex D.3.3.2.3, especially
-			table D.3-3
-		*/
-		struct ImplementationVersion
-		{
-			static const BYTE ItemType_ = 0x55;
-			static const BYTE Reserved_ = 0x00;
+    /*!
+    Part 7, Table D.3-9
+    */
+    struct SCPSCURoleSelect
+    {
+      static const BYTE m_itemType = 0x54;
+      static const BYTE m_reserved = 0x00;
 
-			std::string Name;//May be 1 to 16 characters long.
-		public:
+      UINT16 m_itemLength;//length to end of object - probably shouldn't be a member
+      UID m_UID;
 
-			UINT32 ReadDynamic(Network::Socket& socket);
-			void Write(Network::Socket& socket);
-			UINT32 Size();
-		};
+      BYTE m_SCURole;
+      BYTE m_SCPRole;
 
-		/*!
-			Part 7, Table D.3-9
+      SCPSCURoleSelect();//is this a good idea?
 
-		*/
-		struct	SCPSCURoleSelect
-		{
-			static const BYTE ItemType_ = 0x54;
-			static const BYTE Reserved_ = 0x00;
-			UINT16 ItemLength;//length to end of object - probably shouldn't be a member
-			UID UID_;
+      void write(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
 
-		public:
+    /*!
+    defined in Part 8, table 9-13
+    */
+    struct PresentationContext
+    {
+      /*
+      As far as I can tell, the C++ standard requires that if we ever take the _address_
+      of a static const member (e.g. pass it by reference), then we actually need to
+      instantiate it somewhere.  Practically, only gcc seems to enforce this - MSVC seems
+      to ignore the requirement.
+      */
 
-			BYTE		SCURole_;
-			BYTE		SCPRole_;
-			SCPSCURoleSelect();//is this a good idea?
+      static const BYTE m_itemType = 0x20;
+      static const BYTE m_reserved1 = 0x00;
+      static const BYTE m_reserved2 = 0x00;
+      static const BYTE m_reserved3 = 0x00;
+      static const BYTE m_reserved4 = 0x00;
 
-			void		Write(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32		Size();
+      UINT16 m_length;
+      std::vector<TransferSyntax> m_transferSyntaxes;
 
-		};
+      BYTE m_ID;
+      AbstractSyntax m_AbsSyntax;
 
+      PresentationContext();
+      PresentationContext(const AbstractSyntax&, const std::vector<TransferSyntax>&, BYTE id);
+      PresentationContext(const AbstractSyntax&, BYTE id);
 
-		/*!
-			defined in Part 8, table 9-13
-		*/
-		struct	PresentationContext
-		{
-		private:
-			/*
-				As far as I can tell, the C++ standard requires that if we ever take the _address_
-				of a static const member (e.g. pass it by reference), then we actually need to
-				instantiate it somewhere.  Practically, only gcc seems to enforce this - MSVC seems
-				to ignore the requirement.
-			*/
+      void addTransferSyntax(TransferSyntax&);
+      void write(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
 
-			static const BYTE				ItemType_=0x20;
-			static const BYTE				Reserved1_=0x00;
-			UINT16							Length_;
-		public:
-			BYTE							ID_;
-		private:
-			static const BYTE				Reserved2_=0x00;
-			static const BYTE				Reserved3_=0x00;
-			static const BYTE				Reserved4_=0x00;
-		public:
-			AbstractSyntax				AbsSyntax_;
+    /*!
+    Defined in Part 8, tables D.1-1 and D.1-2
+    */
+    struct MaximumSubLength
+    {
+      static const BYTE m_itemType = 0x51;
+      static const BYTE m_reserved1 = 0x00;
+      static const UINT16 m_length = 0x04;
+      UINT32 m_maximumLength;
 
-			std::vector<TransferSyntax>	TransferSyntaxes_;
-			PresentationContext();
-			PresentationContext(const AbstractSyntax& ,const std::vector<TransferSyntax>&,BYTE id);
-			PresentationContext(const AbstractSyntax&,BYTE id);
+      MaximumSubLength();
+      MaximumSubLength(UINT32);
 
-			//void		SetAbstractSyntax(AbstractSyntax	&);
-			void		AddTransferSyntax(TransferSyntax	&);
-			void		Write(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32	Size();
+      void set(UINT32);
+      UINT32 get();
+      void write(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
 
-		};
+    /*!
+    Defined in Part 8/table 9-16
+    */
+    struct UserInformation
+    {
+      static const BYTE m_itemType = 0x50;
+      static const BYTE m_reserved = 0x00;
 
-		/*!
-			Defined in Part 8, tables D.1-1 and D.1-2
-		*/
-		struct	MaximumSubLength
-		{
-		public	 :
-			static const BYTE			ItemType_ = 0x51;
-			static const BYTE			Reserved1_=0x00;;
-			static const UINT16			Length_ = 0x04;
-			UINT32						MaximumLength_;
-		public:
-			MaximumSubLength();
-			MaximumSubLength(UINT32);
+      UINT32 m_userInfoBaggage;
+      MaximumSubLength m_maxSubLength;
+      ImplementationClass m_impClass;
+      ImplementationVersion m_impVersion;//this is an optional field. 
 
-			void		Set(UINT32);
-			UINT32		Get();
-			void		Write(Network::Socket &);
-	// 		void		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32	Size();
-		};
+      //this is an optional field.  How do we indicate that?
+      SCPSCURoleSelect m_SCPSCURole;
 
+      UserInformation();
 
-		/*!
-			Defined in Part 8/table 9-16
-		*/
-		struct	UserInformation
-		{
+      void setMax(MaximumSubLength&);
 
-			static const BYTE			ItemType_ = 0x50;
-			static const BYTE			Reserved_=0x00;
-			//UINT16						Length_;// This we may or may not need...
-		public:
-			UINT32						UserInfoBaggage_;
-			MaximumSubLength			MaxSubLength_;
-			ImplementationClass			ImpClass_;
-			ImplementationVersion		ImpVersion_;//this is an optional field. 
+      void write(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT16 size();
+    };
 
-			//this is an optional field.  How do we indicate that?
-			SCPSCURoleSelect			SCPSCURole_;
-		public:
-			UserInformation();
+    //!A request to open a dicom association
+    /*!
+    Defined in Part 8, table 9-11
+    */
+    struct AAssociateRQ
+    {
+      static const BYTE m_itemType = 0x01;
+      static const BYTE m_reserved1 = 0x00;
+      static const UINT16 m_protocolVersion = 0x01;
+      static const UINT16 m_reserved2 = 0x00;
 
-			void		SetMax(MaximumSubLength	&);
-			//UINT32		GetMax();
-			void		Write(Network::Socket &);
-			//bool		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT16		Size();
+      std::string m_calledAppTitle;
+      std::string m_callingAppTitle;
+      std::array<BYTE, 32> m_reserved3;
 
+      const ApplicationContext m_appContext;
 
+      //! I think this should be called "ProposedPresentationContexts"
+      std::vector<PresentationContext> m_proposedPresentationContexts;//PresContexts;
+      UserInformation m_userInfo;
 
+      AAssociateRQ();
+      AAssociateRQ(const std::string& CallingAp, const std::string& CalledAp);
 
-		};
+      void setUserInformation(UserInformation&);
+      void write(Network::Socket&);
+      UINT32 read(Network::Socket&);
+      UINT32 readDynamic(Network::Socket&);
+      UINT32 size();
+    };
+  }//namespace primitive
 
-		//!A request to open a dicom association
-		/*!
-			Defined in Part 8, table 9-11
-		*/
-		struct	AAssociateRQ
-		{
+  //this should be replaceable with bind2nd and mem_fun?  or boost function objects?
+  struct WriteToSocket
+  {
+    Network::Socket& m_socket;
 
-			static const BYTE		ItemType_=0x01;
-			static const BYTE		Reserved1_ = 0x00;
-			//UINT32	Length_;		//length to end of object.
-			static const UINT16	ProtocolVersion_=0x01;
-			static const UINT16	Reserved2_=0x00;;
+    WriteToSocket(Network::Socket& socket) :
+      m_socket(socket)
+    {
+    }
 
-
-			std::string CalledAppTitle_;
-			std::string CallingAppTitle_;
-			BYTE		Reserved3_[32];
-
-
-			const ApplicationContext AppContext_;
-
-			//! I think this should be called "ProposedPresentationContexts"
-			std::vector<PresentationContext>	ProposedPresentationContexts_;//PresContexts;
-			UserInformation				UserInfo_;
-
-			AAssociateRQ();
-
-			AAssociateRQ(const std::string& CallingAp, const std::string& CalledAp);
-
-
-			void		SetUserInformation(UserInformation &);
-			void		Write(Network::Socket &);
- 			UINT32		Read(Network::Socket &);
-			UINT32		ReadDynamic(Network::Socket	&);
-			UINT32		Size();
-		};
-	}//namespace primitive
-	//this should be replaceable with bind2nd and mem_fun?  or boost function objects?
-	struct WriteToSocket
-	{
-		Network::Socket& socket_;
-		WriteToSocket(Network::Socket& socket):socket_(socket){}
-		template <typename T>
-			void operator()(T& t)
-		{
-			t.Write(socket_);
-		}
-	};
-
+    template <typename T>
+    void operator()(T& t)
+    {
+      t.write(m_socket);
+    }
+  };
 }//namespace dicom
-#endif //AARQ_INCLUDE_GUARD_7UD3489IDU83

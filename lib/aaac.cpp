@@ -68,7 +68,7 @@ namespace dicom
       socket << m_reserved2;
       socket << m_result;
       socket << m_reserved4;
-      m_trnSyntax.Write(socket);
+      m_trnSyntax.write(socket);
     }
 
     UINT32 PresentationContextAccept::read(Network::Socket& socket)
@@ -102,7 +102,7 @@ namespace dicom
       socket >> tmpBYTE; //Reserved
       byteread += sizeof(m_presentationContextID) + sizeof(tmpBYTE) + sizeof(m_result) + sizeof(tmpBYTE);
 
-      byteread += m_trnSyntax.Read(socket);
+      byteread += m_trnSyntax.read(socket);
 
       Enforce(size() - 4 == length);
       return byteread;
@@ -110,7 +110,7 @@ namespace dicom
 
     UINT16 PresentationContextAccept::size()
     {
-      return m_trnSyntax.Size() + 8;
+      return m_trnSyntax.size() + 8;
     }
 
     /************************************************************************
@@ -154,7 +154,7 @@ namespace dicom
       socket.Sendn(&m_callingAppTitle[0], m_callingAppTitle.size());
 
       socket.Sendn<BYTE>(&m_reserved3[0], m_reserved3.size());
-      m_appContext.Write(socket);
+      m_appContext.write(socket);
 
       std::vector<PresentationContextAccept>::iterator iter = m_presContextAccepts.begin();
       for (; iter != m_presContextAccepts.end(); ++iter)
@@ -162,7 +162,7 @@ namespace dicom
         iter->write(socket);
       }
 
-      m_userInfo.Write(socket);
+      m_userInfo.write(socket);
     }
 
     UINT32 AAssociateAC::read(Network::Socket& socket)
@@ -226,7 +226,7 @@ namespace dicom
         switch(TempByte)
         {
           case 0x50: // user information
-            tmp_read = m_userInfo.ReadDynamic(socket);
+            tmp_read = m_userInfo.readDynamic(socket);
             byteread += tmp_read;
             BytesLeftToRead -= tmp_read;//UserInfo_.Size();
           break;
@@ -240,7 +240,7 @@ namespace dicom
           }
           break;
           case 0x10:
-            tmp_read = m_appContext.ReadDynamic(socket);
+            tmp_read = m_appContext.readDynamic(socket);
             byteread += tmp_read;
             BytesLeftToRead -= tmp_read;//AppContext_.Size();
           break;
@@ -261,7 +261,7 @@ namespace dicom
     UINT32 AAssociateAC::size()
     {
       UINT32 length = sizeof(UINT16) + sizeof(UINT16) + 64;
-      length += m_appContext.Size();
+      length += m_appContext.size();
 
       std::vector<PresentationContextAccept>::iterator iter = m_presContextAccepts.begin();
       for (; iter != m_presContextAccepts.end(); ++iter)
@@ -269,7 +269,7 @@ namespace dicom
         length += iter->size();
       }
 
-      length += m_userInfo.Size();
+      length += m_userInfo.size();
       return (length + sizeof(BYTE) + sizeof(BYTE) + sizeof(UINT32));
     }
   }// namespace primitive

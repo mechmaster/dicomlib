@@ -182,7 +182,7 @@ int main(int, char**)
   //Fl::run();
 	//const std::string dicomDir="/home/chif/Patients/";			//modify this as appropriate
 
-    const std::string dicomDir="/home/chif/Patients/0026_STRUEVA/dicom/S60_anon/";
+  const std::string dicomDir="/home/chif/test_dicom/e97c972138c540e0a4be664c23ddb9a7/";
     //const std::string dicomDir="/home/chif/Patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/Зверев/";
   
     std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
@@ -197,7 +197,7 @@ int main(int, char**)
 
         std::cout << std::endl << "Attempting to open a data set from " << dicomDir << std::endl;
         
-        /*boost::filesystem::recursive_directory_iterator dir(dicomDir), end;
+        boost::filesystem::recursive_directory_iterator dir(dicomDir), end;
         
         while (dir != end)
         {
@@ -217,7 +217,7 @@ int main(int, char**)
           }
           
           ++dir;
-        }*/
+        }
 
         std::cout << std::endl << "Attempting to connect to the remote server at " << host << ":" << remote_port << std::endl;
 		//demo::ConnectToRemoteServer();
@@ -225,11 +225,11 @@ int main(int, char**)
         std::cout <<  std::endl << "Attempting to query the remote server..." << std::endl;
 		//demo::QueryRemoteServer();
       
-        for (unsigned int i = 0; i < 100; ++i)
+        /*for (unsigned int i = 0; i < 100; ++i)
         {
           std::cout <<  std::endl << "Attempting to move DICOM..." << std::endl;
           demo::DoCMove();
-        }
+        }*/
 	}
 	catch(std::exception& e)
 	{
