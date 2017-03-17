@@ -167,7 +167,7 @@ namespace dicom
 		}
 
 		Out.write((const char *)(&*buffer.position()),bytes_to_write);
-		buffer.Increment(bytes_to_write);
+		buffer.increment(bytes_to_write);
 	}
 
 	/*

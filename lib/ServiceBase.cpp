@@ -141,7 +141,7 @@ namespace dicom
 			socket->Sendn(Begin,(BytesInThisChunk));
 
 			//buffer.position()+=(BytesInThisChunk);//this is now a bug...
-			buffer.Increment(BytesInThisChunk);
+			buffer.increment(BytesInThisChunk);
 		}
 	}
 

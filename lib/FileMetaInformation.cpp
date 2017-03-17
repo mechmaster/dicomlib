@@ -207,7 +207,7 @@ namespace dicom
 		while(buffer.position()!=buffer.end())
 		{
 			Out.put(*buffer.position());
-			buffer.Increment(1);
+			buffer.increment(1);
 		}
 
 		return (buffer.size() + 128 + 4);

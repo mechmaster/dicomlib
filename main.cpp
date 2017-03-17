@@ -182,7 +182,7 @@ int main(int, char**)
   //Fl::run();
 	//const std::string dicomDir="/home/chif/Patients/";			//modify this as appropriate
 
-  const std::string dicomDir="/home/chif/test_dicom/e97c972138c540e0a4be664c23ddb9a7/";
+  const std::string dicomDir="/home/chif/dump_dicom/";
     //const std::string dicomDir="/home/chif/Patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/Зверев/";
   
     std::chrono::time_point<std::chrono::system_clock> startTime, endTime;

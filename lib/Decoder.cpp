@@ -197,7 +197,7 @@ namespace dicom{
 				Enforce(TAG_ITEM==offset_table_tag,"Offset table must be defined in encoded data");
 				UINT32 length;
 				buffer_ >> length;
-				buffer_.Increment(length);//we ignore the offset table...
+				buffer_.increment(length);//we ignore the offset table...
 
 				for(;;)
 				{
@@ -473,7 +473,7 @@ namespace dicom{
 						D.Decode();
 
 						//buffer_.position()+=ItemLength;
-						buffer_.Increment(ItemLength);
+						buffer_.increment(ItemLength);
 
 						if(BytesLeftToRead!=UNDEFINED_LENGTH)
 							BytesLeftToRead-=ItemLength;
