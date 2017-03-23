@@ -6,8 +6,7 @@
 *	See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
-#ifndef CDIMSE_HPP_INCLUDE_GUARD_156306638534
-#define CDIMSE_HPP_INCLUDE_GUARD_156306638534
+#pragma once
 
 #include "DataSet.hpp"
 #include "UIDs.hpp"
@@ -36,112 +35,133 @@ namespace dicom
 	We should probably create a Callbacks.hpp file for these typedefs.
 */
 
-
-
-#if defined(_MSC_VER)														//MSVC v7.1 and above may not need this workaround.
-		typedef boost::function3<void,ServiceBase&,const DataSet&,DataSet&>	//msvc needs this non-standard syntax.  See the boost::function tutorial for reasoning.
-			HandlerFunction;												//see boost::function documentation for rationale of alternative syntax.
-		typedef boost::function3<void,ServiceBase&,DataSet&,Sequence&>
-			CFindFunction;
+#if defined(_MSC_VER) //MSVC v7.1 and above may not need this workaround.
+  //msvc needs this non-standard syntax.  See the boost::function tutorial for reasoning.
+  //see boost::function documentation for rationale of alternative syntax.
+  typedef boost::function3<void, ServiceBase&, const DataSet&, DataSet&> HandlerFunction;
+  typedef boost::function3<void, ServiceBase&, DataSet&, Sequence&> CFindFunction;
 #else
-		typedef boost::function<void(ServiceBase& ,const DataSet& , DataSet&)>
-			HandlerFunction;
-		typedef boost::function<void(ServiceBase&,DataSet&,Sequence&)>
-			CFindFunction;
+  typedef boost::function<void(ServiceBase&, const DataSet& , DataSet&)> HandlerFunction;
+  typedef boost::function<void(ServiceBase&, DataSet&, Sequence&)> CFindFunction;
 #endif
 
-	typedef HandlerFunction CMoveFunction;
-	typedef HandlerFunction CStoreFunction;
-	typedef HandlerFunction CGetFunction;
+  typedef HandlerFunction CMoveFunction;
+  typedef HandlerFunction CStoreFunction;
+  typedef HandlerFunction CGetFunction;
 
-	void HandleCEcho(ServiceBase& pdu, const DataSet& command,const UID& classUID);
+  void HandleCEcho(ServiceBase& pdu, const DataSet& command,const UID& classUID);
 
-	void HandleCStore(CStoreFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID);
+  void HandleCStore(CStoreFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID);
 
-	void HandleCFind(CFindFunction  handler,ServiceBase& pdu, const DataSet& command, const UID& classUID);
+  void HandleCFind(CFindFunction  handler,ServiceBase& pdu, const DataSet& command, const UID& classUID);
 
-	void HandleCMove(CMoveFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID);
+  void HandleCMove(CMoveFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID);
 
-	void HandleCGet(CGetFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID);
+  void HandleCGet(CGetFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID);
 
-	class CGetSCP
-	{
-		HandlerFunction handler_;
- 		Sequence m_sq;//is this needed???
-	public:
-		CGetSCP(HandlerFunction handler):handler_(handler){}
-		void handle(ServiceBase& pdu, const DataSet& rqCmd, const UID& classUID);
-	};
+  class CGetSCP
+  {
+    HandlerFunction m_handler;
+
+  public:
+
+    CGetSCP(HandlerFunction handler) :
+      m_handler(handler)
+    {
+      
+    }
+
+    void handle(ServiceBase& pdu, const DataSet& rqCmd, const UID& classUID);
+  };
+
+  /*
+  These classes should probably have a common base (that could
+  containt the UID object.)
+  */
+
+  //!Service Class User.
+  /*!
+  Base class for the various Service Class Users
+  */
+
+  class SCU
+  {
+
+  protected:
+
+    ServiceBase& m_service;
+    const UID m_classUID;
+
+  public:
+
+    SCU(ServiceBase& service, UID classUID) :
+      m_service(service),
+      m_classUID(classUID)
+    {
+    }
+  };
 
 
-	/*
-		These classes should probably have a common base (that could
-		containt the UID object.)
-	*/
+  //!Part 4, Annex A
 
-	//!Service Class User.
-	/*!
-		Base class for the various Service Class Users
-	*/
-	class SCU
-	{
-	protected:
-		ServiceBase& service_;
-		const UID classUID_;
-	public:
-		SCU(ServiceBase& service,UID classUID):service_(service),classUID_(classUID){}
-	};
+  class CEchoSCU : public SCU
+  {
 
+  public:
 
-	//!Part 4, Annex A
+    CEchoSCU(ServiceBase& service);//,const UID& classUID = VERIFICATION_SOP_CLASS);
 
-	class CEchoSCU  : public SCU
-	{
-	public:
+    void writeRQ();
+    void readRSP(UINT16& stat_p);
+    void readRSP(UINT16& status, DataSet& response);
+  };
 
-		CEchoSCU(ServiceBase& service);//,const UID& classUID = VERIFICATION_SOP_CLASS);
-		void writeRQ();
-		void readRSP(UINT16& stat_p);
-		void readRSP(UINT16& status, DataSet& response);
-	};
+  class CStoreSCU : public SCU
+  {
 
-	class CStoreSCU  : public SCU
-	{
-	public:
-		CStoreSCU(ServiceBase& service,const UID& classUID);
-		void writeRQ(const UID& instUID,
-			const DataSet& data,/*TS ts,*/ UINT16 priority = Priority::MEDIUM);
-		void readRSP(UINT16& status);
-		void readRSP(UINT16& status, DataSet& response);
-	};
+  public:
 
-	class CFindSCU  : public SCU
-	{
-	public:
-		CFindSCU(ServiceBase& service,const UID& classUID);
-		void writeRQ(const DataSet& data, UINT16 priority = Priority::MEDIUM);
-		void readRSP(UINT16& status, DataSet&  data);
-		void readRSP(UINT16& status, DataSet& response, DataSet&  data);
-	};
+    CStoreSCU(ServiceBase& service, const UID& classUID);
 
-	class CGetSCU  : public SCU
-	{
-	public:
-		CGetSCU(ServiceBase& service,const UID& classUID);
-		void writeRQ(const DataSet& data, UINT16 priority = Priority::MEDIUM);
-		void readRSP(UINT16& status, DataSet&  data);
-		void readRSP(UINT16& status, DataSet& response, DataSet&  data);
-	};
+    void writeRQ(const UID& instUID, const DataSet& data, UINT16 priority = Priority::MEDIUM);
+    void readRSP(UINT16& status);
+    void readRSP(UINT16& status, DataSet& response);
+  };
 
-	class CMoveSCU  : public SCU
-	{
-		//const std::string m_classUID;
-	public:
-		CMoveSCU(ServiceBase& service,const UID& classUID);
-		void writeRQ(const std::string& destAET,
-			const DataSet& data, UINT16 priority = Priority::MEDIUM);
-		void  readRSP(UINT16& status, DataSet&  data);
-		void readRSP(UINT16& status, DataSet& response, DataSet&  data);
-	};
+  class CFindSCU : public SCU
+  {
+
+  public:
+
+    CFindSCU(ServiceBase& service, const UID& classUID);
+
+    void writeRQ(const DataSet& data, UINT16 priority = Priority::MEDIUM);
+    void readRSP(UINT16& status, DataSet& data);
+    void readRSP(UINT16& status, DataSet& response, DataSet& data);
+  };
+
+  class CGetSCU : public SCU
+  {
+
+  public:
+
+    CGetSCU(ServiceBase& service, const UID& classUID);
+
+    void writeRQ(const DataSet& data, UINT16 priority = Priority::MEDIUM);
+    void readRSP(UINT16& status, DataSet& data);
+    void readRSP(UINT16& status, DataSet& response, DataSet& data);
+  };
+
+  class CMoveSCU : public SCU
+  {
+
+  public:
+
+    CMoveSCU(ServiceBase& service, const UID& classUID);
+
+    void writeRQ(const std::string& destAET, const DataSet& data, UINT16 priority = Priority::MEDIUM);
+    void readRSP(UINT16& status, DataSet& data);
+    void readRSP(UINT16& status, DataSet& response, DataSet& data);
+  };
 }//namespace dicom
-#endif //CDIMSE_HPP_INCLUDE_GUARD_156306638534
+
