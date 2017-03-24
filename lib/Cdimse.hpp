@@ -8,11 +8,13 @@
 
 #pragma once
 
+#include <string>
+
+#include <boost/function.hpp>
+
 #include "DataSet.hpp"
 #include "UIDs.hpp"
 
-#include <string>
-#include <boost/function.hpp>
 #include "ServiceBase.hpp"
 #include "CommandSets.hpp"
 

@@ -6,13 +6,6 @@
 *	See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
-#include <algorithm>
-#include <iostream>
-
-#include "ServiceBase.hpp"
-
-#include "Dumper.hpp"
-
 #include "Cdimse.hpp"
 
 /*
