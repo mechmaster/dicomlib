@@ -31,7 +31,7 @@ and then only accepts one Transfer Syntax.  Why not support the rest?
 
 namespace dicom
 {
-  Network::Socket* ClientConnection::getSocket()
+  Network::Socket* ClientConnection::GetSocket()
   {
     return m_socket.get();
   }

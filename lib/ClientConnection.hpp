@@ -63,7 +63,7 @@ Store should be CStore, etc.
 
   public:
 
-    virtual Network::Socket* getSocket();
+    virtual Network::Socket* GetSocket();
 
     ClientConnection(std::string Host, unsigned short Port, std::string LocalAET, std::string RemoteAET,
       const PresentationContexts& ProposedPresentationContexts);

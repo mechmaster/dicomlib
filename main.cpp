@@ -79,7 +79,7 @@ namespace demo
 		presentation_contexts.Add(dicom::MAMMO_PRES_IMAGE_STORAGE_SOP_CLASS);
 		presentation_contexts.Add(dicom::MAMMO_PROC_IMAGE_STORAGE_SOP_CLASS);
 		//add further presentation contexts as appropriate...
-		dicom::ClientConnection connection(host,remote_port,local_AE,remote_AE,presentation_contexts);
+		dicom::ClientConnection connection(host, remote_port, local_AE, remote_AE, presentation_contexts);
 	}
 
 	void PrintResult(const dicom::DataSet& data)
@@ -91,7 +91,7 @@ namespace demo
 		dicom::PresentationContexts presentation_contexts;
 		presentation_contexts.Add(dicom::STUDY_ROOT_QR_FIND_SOP_CLASS);
 	
-		dicom::ClientConnection connection(host,remote_port,local_AE,remote_AE,presentation_contexts);
+		dicom::ClientConnection connection(host, remote_port, local_AE, remote_AE, presentation_contexts);
 		
 		
 		//build a query to search for all studies on patients names beginning with "A"
@@ -101,7 +101,7 @@ namespace demo
 		query.Put<dicom::VR_PN>(dicom::TAG_PAT_NAME,std::string("*"));
 		
 		//execute the query
-		std::vector<dicom::DataSet> result = connection.Find(query,dicom::QueryRetrieve::STUDY_ROOT);
+		std::vector<dicom::DataSet> result = connection.find(query,dicom::QueryRetrieve::STUDY_ROOT);
 
 		//print the results
 		std::for_each(result.begin(),result.end(),PrintResult);
@@ -117,7 +117,7 @@ namespace demo
 		presentation_contexts.Add(dicom::STUDY_ROOT_QR_MOVE_SOP_CLASS);
 		//presentation_contexts.Add(dicom::PATIENT_ROOT_QR_MOVE_SOP_CLASS);
 
-		dicom::ClientConnection connection(host,remote_port,local_AE,remote_AE,presentation_contexts);
+		dicom::ClientConnection connection(host, remote_port, local_AE, remote_AE, presentation_contexts);
 		
         static unsigned int count = 0;
         static std::vector<std::string> UID_list = boost::assign::list_of ("1.2.392.200036.9116.2.6.1.48.1214242831.1408519596.617924")
@@ -164,7 +164,7 @@ namespace demo
         try
         {
           //request that a set of images be sent.
-          dicom::DataSet result=connection.Move("MECHGRAD", request, dicom::QueryRetrieve::STUDY_ROOT);
+          dicom::DataSet result=connection.move("MECHGRAD", request, dicom::QueryRetrieve::STUDY_ROOT);
           std::cout << result << std::endl;
         }
         catch(std::exception& e)
