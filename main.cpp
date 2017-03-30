@@ -96,9 +96,9 @@ namespace demo
 		
 		//build a query to search for all studies on patients names beginning with "A"
 		dicom::DataSet query;
-		query.Put<dicom::VR_CS>(dicom::TAG_QR_LEVEL,std::string("STUDY"));
-		query.Put<dicom::VR_UI>(dicom::TAG_STUDY_INST_UID,dicom::UID("*"));
-		query.Put<dicom::VR_PN>(dicom::TAG_PAT_NAME,std::string("*"));
+		query.put<dicom::VR_CS>(dicom::TAG_QR_LEVEL,std::string("STUDY"));
+		query.put<dicom::VR_UI>(dicom::TAG_STUDY_INST_UID,dicom::UID("*"));
+		query.put<dicom::VR_PN>(dicom::TAG_PAT_NAME,std::string("*"));
 		
 		//execute the query
 		std::vector<dicom::DataSet> result = connection.find(query,dicom::QueryRetrieve::STUDY_ROOT);
@@ -128,14 +128,14 @@ namespace demo
         
 		//make CMove request
 		dicom::DataSet request;
-		request.Put<dicom::VR_CS>(dicom::TAG_QR_LEVEL,std::string("SERIES"));
+		request.put<dicom::VR_CS>(dicom::TAG_QR_LEVEL,std::string("SERIES"));
         
         ++count;
         if (count >= UID_list.size())
         {
           count = 0;
         }
-		request.Put<dicom::VR_UI>(dicom::TAG_SERIES_INST_UID,dicom::UID(UID_list[count]));
+		request.put<dicom::VR_UI>(dicom::TAG_SERIES_INST_UID,dicom::UID(UID_list[count]));
         
         std::string  serverWorkingDirectory("/home/chif/.local/share/SamSMU/pacs/dicom/");
         boost::filesystem::path path(serverWorkingDirectory);

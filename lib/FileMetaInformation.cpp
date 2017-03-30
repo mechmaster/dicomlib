@@ -66,17 +66,17 @@ namespace dicom
 		TypeFromVR<VR_OB>::Type VersionInfoData;//Set to (0,1) for the version of the standard that we support.
 		VersionInfoData.push_back(0x00);
 		VersionInfoData.push_back(0x01);
-		MetaElements_.Put<VR_OB>(TAG_FILE_INFO_VERS,VersionInfoData);
+		MetaElements_.put<VR_OB>(TAG_FILE_INFO_VERS,VersionInfoData);
 
-		MetaElements_.Put<VR_UI>(TAG_MEDIA_SOP_CLASS_UID,classUID);
-		MetaElements_.Put<VR_UI>(TAG_MEDIA_SOP_INST_UID,instUID);
-		MetaElements_.Put<VR_UI>(TAG_TRANSFER_SYNTAX_UID,ts.getUID());
-		MetaElements_.Put<VR_UI>(TAG_IMPL_CLASS_UID,UID(ImplementationClassUID));
-		MetaElements_.Put<VR_SH>(TAG_IMPL_VERS_NAME,ImplementationVersionName);
+		MetaElements_.put<VR_UI>(TAG_MEDIA_SOP_CLASS_UID,classUID);
+		MetaElements_.put<VR_UI>(TAG_MEDIA_SOP_INST_UID,instUID);
+		MetaElements_.put<VR_UI>(TAG_TRANSFER_SYNTAX_UID,ts.getUID());
+		MetaElements_.put<VR_UI>(TAG_IMPL_CLASS_UID,UID(ImplementationClassUID));
+		MetaElements_.put<VR_SH>(TAG_IMPL_VERS_NAME,ImplementationVersionName);
 		//MetaElements_.Put<VR_AE>(TAG_SRC_AET,SourceApplicationTitle);//this is optional
 		UINT32 group_length=GroupLength(MetaElements_,TS(EXPL_VR_LE_TRANSFER_SYNTAX/*TS::EXPL_VR_LE*/));
 
-		MetaElements_.Put<VR_UL> (TAG_FILE_INFO_GR_LEN,group_length);//because multimap is sorted, this will
+		MetaElements_.put<VR_UL> (TAG_FILE_INFO_GR_LEN,group_length);//because multimap is sorted, this will
 																	//get inserted at the front of MetaElements_
 
 		if(MetaElements_.find(TAG_FILE_INFO_GR_LEN)!=MetaElements_.begin())
@@ -116,17 +116,17 @@ namespace dicom
 		TypeFromVR<VR_OB>::Type VersionInfoData;//Set to (0,1) for the version of the standard that we support.
 		VersionInfoData.push_back(0x00);
 		VersionInfoData.push_back(0x01);
-		MetaElements_.Put<VR_OB>(TAG_FILE_INFO_VERS,VersionInfoData);
+		MetaElements_.put<VR_OB>(TAG_FILE_INFO_VERS,VersionInfoData);
 
-		MetaElements_.Put<VR_UI>(TAG_MEDIA_SOP_CLASS_UID,classUID);
-		MetaElements_.Put<VR_UI>(TAG_MEDIA_SOP_INST_UID,instUID);
-		MetaElements_.Put<VR_UI>(TAG_TRANSFER_SYNTAX_UID,ts.getUID());
-		MetaElements_.Put<VR_UI>(TAG_IMPL_CLASS_UID,UID(ImplementationClassUID));
-		MetaElements_.Put<VR_SH>(TAG_IMPL_VERS_NAME,ImplementationVersionName);
+		MetaElements_.put<VR_UI>(TAG_MEDIA_SOP_CLASS_UID,classUID);
+		MetaElements_.put<VR_UI>(TAG_MEDIA_SOP_INST_UID,instUID);
+		MetaElements_.put<VR_UI>(TAG_TRANSFER_SYNTAX_UID,ts.getUID());
+		MetaElements_.put<VR_UI>(TAG_IMPL_CLASS_UID,UID(ImplementationClassUID));
+		MetaElements_.put<VR_SH>(TAG_IMPL_VERS_NAME,ImplementationVersionName);
 		//MetaElements_.Put<VR_AE>(TAG_SRC_AET,SourceApplicationTitle);//this is optional
 		UINT32 group_length=GroupLength(MetaElements_,TS(EXPL_VR_LE_TRANSFER_SYNTAX/*TS::EXPL_VR_LE*/));
 
-		MetaElements_.Put<VR_UL> (TAG_FILE_INFO_GR_LEN,group_length);//because multimap is sorted, this will
+		MetaElements_.put<VR_UL> (TAG_FILE_INFO_GR_LEN,group_length);//because multimap is sorted, this will
 																	//get inserted at the front of MetaElements_
 
 		if(MetaElements_.find(TAG_FILE_INFO_GR_LEN)!=MetaElements_.begin())

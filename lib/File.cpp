@@ -125,7 +125,7 @@ namespace dicom
 
 		//I insist on putting the ts into the data so that user has an chance to interpret pixel data correctly. -Sam
 		if(ts.isEncapsulated() || ts.isDeflated())
-			data.Put<VR_UI>(TAG_TRANSFER_SYNTAX_UID,TransferSyntaxUID);
+			data.put<VR_UI>(TAG_TRANSFER_SYNTAX_UID,TransferSyntaxUID);
 	}
 
 	void WriteToStream(const DataSet& data,std::ostream& Out,TS ts, bool Tiff)

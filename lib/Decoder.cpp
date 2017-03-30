@@ -69,7 +69,7 @@ namespace dicom{
 			//the 'template' keyword in the following line is technically redundant
 			//but works round a known bug in gcc.
 			//See http://gcc.gnu.org/cgi-bin/gnatsweb.pl?cmd=view%20audit-trail&database=gcc&pr=9510
-			dataset_.template Put<vr>(tag,data);
+			dataset_.put<vr>(tag,data);
 
 		}
 
@@ -86,7 +86,7 @@ namespace dicom{
 
 			if(length==0)
 			{
-				dataset_.template Put<vr>(tag);
+				dataset_.put<vr>(tag);
 				return;
 			}
 			Buffer::iterator end = buffer_.position()+length;
@@ -110,7 +110,7 @@ namespace dicom{
 			buffer_>>s;
 			if (length == 0) //Sam Shen put this block here to avoid missing the blank strings
 			{
-				dataset_.template Put<vr>(tag,s);
+				dataset_.put<vr>(tag,s);
 				return;
 			}
 
@@ -123,7 +123,7 @@ namespace dicom{
 			StripTrailingNull(s);
 
 			if (vr==VR_CS || vr==VR_AS || vr==VR_LT || vr==VR_ST || vr==VR_UT)
-				dataset_.template Put<vr>(tag,s);
+				dataset_.put<vr>(tag,s);
 			else
 			{
 			//	parse multiplicity using boost::tokenizer
@@ -133,7 +133,7 @@ namespace dicom{
 				tokenizer tokens(s, sep);
 
 				for (tokenizer::iterator tok_iter = tokens.begin();tok_iter != tokens.end(); ++tok_iter)
-					dataset_.template Put<vr>(tag,*tok_iter);
+					dataset_.put<vr>(tag,*tok_iter);
 			}
 
 			/**	Question: Is the multiplicity of CS 1 for the above block?  
@@ -150,7 +150,7 @@ namespace dicom{
 			{
 				UID uid(s);
 				//dataset_.template Put<VR_UI>(tag,uid);
-				dataset_.Put<VR_UI>(tag,uid);
+				dataset_.put<VR_UI>(tag,uid);
 				return;
 			}
 
@@ -167,7 +167,7 @@ namespace dicom{
 
 			for (tokenizer::iterator tok_iter = tokens.begin();tok_iter != tokens.end(); ++tok_iter)
 				//dataset_.template Put<VR_UI>(tag,UID(*tok_iter));
-				dataset_.Put<VR_UI>(tag,UID(*tok_iter));
+				dataset_.put<VR_UI>(tag,UID(*tok_iter));
 		}
 
 
@@ -210,14 +210,14 @@ namespace dicom{
 					Enforce(TAG_ITEM==tag,"Tag must be sequence item");
 					TypeFromVR<VR_OB>::Type data(length,0);
 					buffer_>>data;
-					dataset_.Put<VR_OB>(TAG_PIXEL_DATA,data);
+					dataset_.put<VR_OB>(TAG_PIXEL_DATA,data);
 				}
 			}
 			else
 			{
 				TypeFromVR<VR_OB>::Type data(length,0);
 				buffer_>>data;
-				dataset_.Put<VR_OB>(tag,data);
+				dataset_.put<VR_OB>(tag,data);
 			}
 		}
 
@@ -364,7 +364,7 @@ namespace dicom{
 															// two-byte characters, and 'length' is the number
 															// of bytes.
 				buffer_>>data;
-				dataset_.Put<VR_OW>(tag,data);
+				dataset_.put<VR_OW>(tag,data);
 			}
 			break;
 		case VR_UL://unsigned long
@@ -389,7 +389,7 @@ namespace dicom{
 				{
 					vector <BYTE> v (length);
 					buffer_>>v;
-					dataset_.Put<VR_UN>(tag,v);
+					dataset_.put<VR_UN>(tag,v);
 				}
 			}
 			break;
@@ -501,7 +501,7 @@ namespace dicom{
 					if(BytesLeftToRead==0)
 					{
 
-						dataset_.Put<VR_SQ>(SequenceTag,sequence);
+						dataset_.put<VR_SQ>(SequenceTag,sequence);
 
 						return;
 					}
@@ -514,7 +514,7 @@ namespace dicom{
 
 				//we're done
 
-				dataset_.Put<VR_SQ>(SequenceTag,sequence);
+				dataset_.put<VR_SQ>(SequenceTag,sequence);
 
 				return;
 			default:
@@ -523,7 +523,7 @@ namespace dicom{
 			}
 		}
 
-		dataset_.Put<VR_SQ>(SequenceTag,sequence);
+		dataset_.put<VR_SQ>(SequenceTag,sequence);
 	}
 
 	void Decoder::Decode()

@@ -61,15 +61,15 @@ namespace dicom{
 		}
 
 		//populate dataset
-		view_ds.Put<VR_SH>(TAG_CODE_VALUE, entry.view_code_value);//T1
-		view_ds.Put<VR_SH>(TAG_CODING_SCHEME_DESIGNATOR, entry.view_coding_scheme_designator);//T1
-		view_ds.Put<VR_SH>(TAG_CODE_MEANING, entry.view_code_meaning);//T1
+		view_ds.put<VR_SH>(TAG_CODE_VALUE, entry.view_code_value);//T1
+		view_ds.put<VR_SH>(TAG_CODING_SCHEME_DESIGNATOR, entry.view_coding_scheme_designator);//T1
+		view_ds.put<VR_SH>(TAG_CODE_MEANING, entry.view_code_meaning);//T1
 
 		//make empty view modifier sequence
 		dicom::Sequence view_modifier_seq;
 		dicom::DataSet view_modifier_ds;
 		view_modifier_seq.push_back(view_modifier_ds);
-		view_ds.Put<VR_SQ>(makeTag(0x0054, 0x0222), view_modifier_seq);
+		view_ds.put<VR_SQ>(makeTag(0x0054, 0x0222), view_modifier_seq);
 
 
 		view_seq.push_back(view_ds);
@@ -81,7 +81,7 @@ namespace dicom{
 		//view_ds.Put<VR_SQ>(makeTag(0x0054, 0x0222), view_modifier_seq);
 
 		data_set.erase(makeTag(0x0054, 0x0220));
-		data_set.Put<VR_SQ>(makeTag(0x0054, 0x0220),view_seq);
+		data_set.put<VR_SQ>(makeTag(0x0054, 0x0220),view_seq);
 	}
 
 

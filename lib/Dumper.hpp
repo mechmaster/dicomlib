@@ -2,6 +2,7 @@
 #ifndef DUMPER_HPP_INCLUDE_GUARD_123416013
 #define DUMPER_HPP_INCLUDE_GUARD_123416013
 
+#include <iostream>
 #include <ostream>
 #include "DataSet.hpp"
 namespace dicom
