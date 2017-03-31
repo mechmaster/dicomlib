@@ -14,13 +14,9 @@
 */
 
 #include <algorithm>
-#include <sstream>
 #include <map>
 
 #include "boost/format.hpp"
-
-#include "VR.hpp"
-#include "Tag.hpp"
 
 #include "DataDictionary.hpp"
 
