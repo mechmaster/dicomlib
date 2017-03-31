@@ -46,7 +46,7 @@ namespace demo
 		std::cout << data << std::endl;
 
 
-		std::string PatientID;
+		/*std::string PatientID;
         std::string PatientBD;
         std::string SeriesNO;
         std::string Modality;
@@ -62,7 +62,7 @@ namespace demo
         std::cout << "Patient Birth Date is " << PatientBD << std::endl;
         std::cout << "Patient name is " << PatientName << std::endl;
         std::cout << "Series NO = " << SeriesNO << std::endl;
-        std::cout << "Modality = " << Modality << std::endl;
+        std::cout << "Modality = " << Modality << std::endl;*/
 
 		std::cout << "Pixel data is " <<  data(dicom::TAG_PIXEL_DATA) << std::endl;
 
@@ -182,8 +182,8 @@ int main(int, char**)
   //Fl::run();
 	//const std::string dicomDir="/home/chif/Patients/";			//modify this as appropriate
 
-  const std::string dicomDir="/home/chif/dump_dicom/";
-    //const std::string dicomDir="/home/chif/Patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/Зверев/";
+  const std::string dicomDir="/home/chif/test_dicom/fe491e2d4abb4c9da3f3c84fa8158b20/";
+  //const std::string dicomDir="/home/chif/test_patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/DICOM/ST00001/SE00007/";
   
     std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
     startTime = std::chrono::system_clock::now();
