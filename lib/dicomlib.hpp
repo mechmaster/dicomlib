@@ -6,10 +6,8 @@
 *	See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
+#pragma once
 
-
-#ifndef DICOMLIB_HPP_INCLUDE_GUARD_18476324756293
-#define DICOMLIB_HPP_INCLUDE_GUARD_18476324756293
 /*
 	Nicely wraps up all needed #includes.  For external use only.
 
@@ -18,6 +16,7 @@
 	application with multithreaded TCP/IP server capabilities, you must
 	also include "dicomlib/Server.hpp"
 */
+
 #include "AssociationRejection.hpp"
 #include "Cdimse.hpp"
 #include "ClientConnection.hpp"
@@ -31,5 +30,3 @@
 #include "PresentationContexts.hpp"
 #include "Version.hpp"
 #include "ViewCodeSequence.hpp"
-
-#endif //DICOMLIB_HPP_INCLUDE_GUARD_18476324756293
