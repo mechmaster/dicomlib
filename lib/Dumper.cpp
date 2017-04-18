@@ -6,36 +6,39 @@
 *	See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
-#include "Dumper.hpp"
 #include "DataDictionary.hpp"
 #include "ValueToStream.hpp"
-using std::ostream;
+
+#include "Dumper.hpp"
+
 namespace dicom
 {
-	struct Dumper
-	{
-		std::ostream& Out_;
-		Dumper(std::ostream& Out);
-		void operator()(const DataSet::value_type& v);
-	};
+  struct Dumper
+  {
+    Dumper(std::ostream& Out);
+    void operator()(const DataSet::value_type& v);
+    
+    std::ostream& m_out;
+  };
 
-	Dumper::Dumper(ostream& Out):Out_(Out)
-	{
-	}
-	void Dumper::operator()(const DataSet::value_type& v)
-	{
-		Out_ << GetName(v.first) << "\t" << v.second << std::endl;
-	}
+  Dumper::Dumper(std::ostream& Out) :
+    m_out(Out)
+  {
+  }
 
-	void Dump(const DataSet& data,std::ostream& Out)
-	{
-		std::for_each(data.begin(),data.end(),Dumper(Out));
-	}
+  void Dumper::operator()(const DataSet::value_type& v)
+  {
+    m_out << GetName(v.first) << "\t" << v.second << std::endl;
+  }
 
+  void Dump(const DataSet& data, std::ostream& Out)
+  {
+    std::for_each(data.begin(), data.end(), Dumper(Out));
+  }
 
-	ostream& operator <<  (ostream& Out, const DataSet& data)
-	{
-		Dump(data,Out);
-		return Out;
-	}
+  std::ostream& operator << (std::ostream& Out, const DataSet& data)
+  {
+    Dump(data, Out);
+    return Out;
+  }
 }//namespace dicom

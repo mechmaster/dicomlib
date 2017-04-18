@@ -182,8 +182,8 @@ int main(int, char**)
   //Fl::run();
 	//const std::string dicomDir="/home/chif/Patients/";			//modify this as appropriate
 
-  const std::string dicomDir="/home/chif/test_dicom/fe491e2d4abb4c9da3f3c84fa8158b20/";
-  //const std::string dicomDir="/home/chif/test_patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/DICOM/ST00001/SE00007/";
+  //const std::string dicomDir="/home/chif/test_dicom/04933acdc04543b8a6d68917c87a5077/";
+  const std::string dicomDir="/home/chif/test_patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/DICOM/ST00001/SE00007/";
   
     std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
     startTime = std::chrono::system_clock::now();
