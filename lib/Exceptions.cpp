@@ -9,29 +9,27 @@
 //Implementation of exception classes.
 
 #include "Exceptions.hpp"
-#include <sstream>
-#include <iostream>
-using namespace std;
+
 namespace dicom
 {
-	exception::exception(std::string What) 
-	: What_(What)
-	{	
-	}
-	
+  exception::exception(std::string what) :
+    m_what(what)
+  {
+  }
 
-	const char*
-	exception::what() const throw()
-	{
-		return What_.c_str();
-	}
-	
-	/*!
-		Simplified from http://www.cuj.com/documents/s=8250/cujcexp2106alexandr/alexandr.htm
-	*/
-	void Enforce(bool Condition,std::string Comment)
-	{
-		if(!Condition)
-			throw dicom::exception(Comment);
-	}
+  const char* exception::what() const throw()
+  {
+    return m_what.c_str();
+  }
+
+  /*!
+  Simplified from http://www.cuj.com/documents/s=8250/cujcexp2106alexandr/alexandr.htm
+  */
+  void Enforce(bool Condition, std::string Comment)
+  {
+    if(!Condition)
+    {
+      throw dicom::exception(Comment);
+    }
+  }
 }

@@ -44,13 +44,13 @@ namespace demo
 
         std::cout << "File Opened" << std::endl;
 		std::cout << data << std::endl;
-
-
+        
 		/*std::string PatientID;
         std::string PatientBD;
         std::string SeriesNO;
         std::string Modality;
         std::string PatientName;
+        std::string ImagePosition;
 
 		data(dicom::TAG_PAT_ID) >> PatientID;
         data(dicom::TAG_PAT_BIRTH_DATE) >> PatientBD;
@@ -63,9 +63,6 @@ namespace demo
         std::cout << "Patient name is " << PatientName << std::endl;
         std::cout << "Series NO = " << SeriesNO << std::endl;
         std::cout << "Modality = " << Modality << std::endl;*/
-
-		std::cout << "Pixel data is " <<  data(dicom::TAG_PIXEL_DATA) << std::endl;
-
 		
 		//We can access underlying pixel data as follows:
 		std::vector<unsigned short> PixelData;
@@ -182,8 +179,8 @@ int main(int, char**)
   //Fl::run();
 	//const std::string dicomDir="/home/chif/Patients/";			//modify this as appropriate
 
-  //const std::string dicomDir="/home/chif/test_dicom/04933acdc04543b8a6d68917c87a5077/";
-  const std::string dicomDir="/home/chif/test_patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/DICOM/ST00001/SE00007/";
+  const std::string dicomDir="/home/chif/test_dicom/91aded844f204d45b098d88f15055bd6/";
+  //const std::string dicomDir="/home/chif/test_patients/0003_ZVEREV/dicom/ZVEREV_V_N_20_08_14/DICOM/ST00001/SE00007/";
   
     std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
     startTime = std::chrono::system_clock::now();

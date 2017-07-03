@@ -416,7 +416,7 @@ namespace dicom
     d.decode();
   }
 
-  void ReadElementFromBuffer(Buffer& buffer, DataSet& ds,TS transfer_syntax)
+  void ReadElementFromBuffer(Buffer& buffer, DataSet& ds, TS transfer_syntax)
   {
     Decoder d(buffer, ds, transfer_syntax);
     d.decodeElement();
