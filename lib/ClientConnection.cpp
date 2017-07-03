@@ -36,8 +36,8 @@ namespace dicom
     return m_socket.get();
   }
 
-  ClientConnection::ClientConnection(std::string Host, unsigned short Port, std::string LocalAET, std::string RemoteAET,
-    const PresentationContexts& ProposedPresentationContexts) :
+  ClientConnection::ClientConnection(const std::string& Host, unsigned short Port, const std::string& LocalAET,
+    const std::string& RemoteAET, const PresentationContexts& ProposedPresentationContexts) :
     m_socket(new Network::ClientSocket(Host, Port))
   {
     primitive::AAssociateRQ& association_request = AAssociateRQ_;//BAD BAD BAD

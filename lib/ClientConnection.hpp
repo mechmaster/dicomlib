@@ -65,7 +65,7 @@ Store should be CStore, etc.
 
     virtual Network::Socket* GetSocket();
 
-    ClientConnection(std::string Host, unsigned short Port, std::string LocalAET, std::string RemoteAET,
+    ClientConnection(const std::string& Host, unsigned short Port, const std::string& LocalAET, const std::string& RemoteAET,
       const PresentationContexts& ProposedPresentationContexts);
     virtual ~ClientConnection();
 
