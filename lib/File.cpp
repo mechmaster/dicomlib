@@ -102,11 +102,7 @@ namespace dicom
     file to start reading the DataSet.
     */
 
-    std::uint64_t BytesToRead = GetStreamSize(In) - In.tellg();
-    if (max_number_of_byte_to_read > 0)
-    {
-      BytesToRead = std::min(BytesToRead, max_number_of_byte_to_read);
-    }
+    const std::uint64_t BytesToRead = GetStreamSize(In) - In.tellg();
 
     int ByteOrder = ts.isBigEndian() ? __BIG_ENDIAN : __LITTLE_ENDIAN;
 
@@ -115,7 +111,8 @@ namespace dicom
     //Read data from stream onto buffer.
     buffer.assign(BytesToRead, 0);
 
-    In.read(reinterpret_cast<char*>(&buffer[0]), BytesToRead); //This is the most time intensive part. Can we speed it up any?
+
+    In.read(reinterpret_cast<char*>(&buffer[0]), buffer.size()); //This is the most time intensive part. Can we speed it up any?
     //Transfer data from buffer onto dataset
 
     ReadFromBuffer(buffer, data, ts);

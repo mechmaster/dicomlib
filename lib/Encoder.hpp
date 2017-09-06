@@ -89,7 +89,7 @@ namespace dicom
         std::string s;
         const Value& value = Begin->second;
 
-        if((vr != value.vr()) or (tag != Begin->first)) // this block is basically an ASSERT, ie I expect it to never be entered.
+        if((vr != value.vr()) || (tag != Begin->first)) // this block is basically an ASSERT, ie I expect it to never be entered.
         {
           //we have a major problem.
           throw dicom::exception("Some inconsistency in dataset.");
@@ -103,7 +103,7 @@ namespace dicom
 
       StringToSend.erase(StringToSend.end() - 1); //remove last delimiter.
 
-      if(StringToSend.size() bitand 0x01)//length is odd
+      if(StringToSend.size() & 0x01)//length is odd
       {
         StringToSend.append(1, ' ');//string length must be even.
       }

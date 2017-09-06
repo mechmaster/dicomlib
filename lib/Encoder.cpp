@@ -49,7 +49,7 @@ namespace dicom
       UID uid;
       const Value& value = Begin->second;
       
-      if((VR_UI != value.vr()) or (tag != Begin->first))
+      if((VR_UI != value.vr()) || (tag != Begin->first))
       {
         throw dicom::exception("Some inconsistency in dataset.");
       }
@@ -61,7 +61,7 @@ namespace dicom
     
     StringToSend.erase(StringToSend.end() - 1);//remove last delimiter.
     
-    if(StringToSend.size() bitand 0x01) //length is odd
+    if(StringToSend.size() & 0x01) //length is odd
     {
       StringToSend.append(1, '\0'); //length must be even, NULL character is used for padding UIDs
     }

@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <map>
+#include <iterator>
 
 #include "boost/format.hpp"
 
