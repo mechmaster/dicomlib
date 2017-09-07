@@ -7,8 +7,6 @@
  *
  ****************************************************************************/
 
-#include "socket/Base.hpp"
-#include "socket/Socket.hpp"
 #include "Types.hpp"
 #include "DataSet.hpp"
 #include "Buffer.hpp"

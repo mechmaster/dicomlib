@@ -44,7 +44,6 @@
 
 #include "UID.hpp"
 #include "Types.hpp"
-#include "socket/Socket.hpp"
 
 /*
 * PDU Service Classes:

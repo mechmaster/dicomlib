@@ -1,7 +1,7 @@
 #ifndef SERVICE_BASE_HPP_23847239487238
 #define SERVICE_BASE_HPP_23847239487238
 #include <string>
-#include "socket/Socket.hpp"
+
 #include "Buffer.hpp"
 #include "DataSet.hpp"
 #include "TransferSyntax.hpp"

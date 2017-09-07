@@ -65,11 +65,6 @@ set(dicom_header_files
   lib/QueryRetrieve.hpp
   lib/Version.hpp
   lib/ViewCodeSequence.hpp
-  lib/socket/Base.hpp
-  lib/socket/EnablesWinSock.hpp
-  lib/socket/Socket.hpp
-  lib/socket/SwitchEndian.hpp
-  lib/socket/SystemError.hpp
 )
 
 cmake_minimum_required(VERSION 2.8)

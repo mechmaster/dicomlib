@@ -5,8 +5,6 @@
 
 #include <boost/utility.hpp>
 
-#include "socket/Base.hpp"
-#include "socket/SwitchEndian.hpp"
 #include "Types.hpp"
 #include "Exceptions.hpp"
 #include "Tag.hpp"

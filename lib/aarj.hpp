@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "socket/Socket.hpp"
 #include "Types.hpp"
 
 namespace dicom
