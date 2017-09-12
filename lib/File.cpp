@@ -8,7 +8,6 @@
 
 #include <boost/format.hpp>
 
-#include "Buffer.hpp"
 #include "TransferSyntax.hpp"
 #include "Decoder.hpp"
 #include "Encoder.hpp"

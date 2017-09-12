@@ -38,17 +38,17 @@ namespace dicom
     }
   }
 
-  void Decoder::decodeVRAndLength(Tag tag, VR& vr, UINT32& length)
+  void Decoder::decodeVRAndLength(Tag tag, VR& vr, std::uint32_t& length)
   {
     if(m_ts.isExplicitVR()) //then get VR from stream, VR always little_endian -Sam
     {
-      BYTE b1;
-      BYTE b2;
+      std::uint8_t b1;
+      std::uint8_t b2;
 
       m_buffer >> b1;
       m_buffer >> b2;
 
-      UINT16 w = (UINT16(b2) << 8) | b1;
+      std::uint16_t w = (std::uint16_t(b2) << 8) | b1;
 
       vr=VR(w);
 
@@ -70,7 +70,7 @@ namespace dicom
       //This is a hack to determine if it is OW or OB in case implicit vr and tag==TAG_PIXEL_DATA -Sam
       if (tag == TAG_PIXEL_DATA)
       {
-        UINT16 bits = 0;
+        std::uint16_t bits = 0;
 
         if (m_dataset.exists(TAG_BITS_ALLOC))
         {
@@ -103,7 +103,7 @@ namespace dicom
 
     if (tag == TAG_ITEM_DELIM_ITEM)
     {
-      UINT32 dummy_length;
+      std::uint32_t dummy_length;
       m_buffer >> dummy_length; //deliminator item always has length 0x00000000;
 
       throw EndOfSequence(); //ie jump to end of loop in Decoder::Decode()
@@ -112,7 +112,7 @@ namespace dicom
     }
 
     VR vr;
-    UINT32 length;
+    std::uint32_t length;
 
     decodeVRAndLength(tag, vr, length);
 
@@ -200,7 +200,7 @@ namespace dicom
         {
           if (length > 0)
           {
-            std::vector<BYTE> v(length);
+            std::vector<std::uint8_t> v(length);
             m_buffer >> v;
             m_dataset.put<VR_UN>(tag, v);
           }
@@ -237,8 +237,8 @@ namespace dicom
       case VR_AE:
         return decodeString<VR_AE>(tag, length);
       default:
-        std::cout << "Unknown VR: " << UINT32(vr) << " in DecodeElement()" << std::endl;
-        std::cout << "Tag is: " << UINT32(tag) << "  dataset size is " << m_dataset.size() << std::endl;
+        std::cout << "Unknown VR: " << std::uint32_t(vr) << " in DecodeElement()" << std::endl;
+        std::cout << "Tag is: " << std::uint32_t(tag) << "  dataset size is " << m_dataset.size() << std::endl;
         throw UnknownVR(vr);
     }
   }
@@ -246,21 +246,21 @@ namespace dicom
   /*!
   Sequences are described in Part 5, section 7.5.
   */
-  void Decoder::decodeSequence(Tag SequenceTag, UINT32 SequenceLength)
+  void Decoder::decodeSequence(Tag SequenceTag, std::uint32_t SequenceLength)
   {
     //need to keep track of bytes read if SequenceLength is not UNDEFINED_LENGTH
     Sequence sequence;
-    UINT32 BytesLeftToRead = SequenceLength;
+    std::uint32_t BytesLeftToRead = SequenceLength;
 
     while(BytesLeftToRead > 0)
     {
-      UINT16 Group;
-      UINT16 Element;
+      std::uint16_t Group;
+      std::uint16_t Element;
       m_buffer >>Group;
       m_buffer >>Element;
       Tag tag=makeTag(Group,Element);
 
-      UINT32 ItemLength;
+      std::uint32_t ItemLength;
       m_buffer >> ItemLength;
 
       if(BytesLeftToRead!=UNDEFINED_LENGTH)
@@ -271,57 +271,59 @@ namespace dicom
       {
       DataSet data;
 
-      if(ItemLength!=UNDEFINED_LENGTH)
+      if(ItemLength != UNDEFINED_LENGTH)
       {
-      /* make a copy of relevant bit of buffer.
-      * This is time-intensive, but simplifies the code considerably.
-      */
+        /* make a copy of relevant bit of buffer.
+        * This is time-intensive, but simplifies the code considerably.
+        */
 
 
-      Buffer b(m_buffer.GetEndian());
-      std::copy(m_buffer.position(),m_buffer.position()+ItemLength,std::back_inserter(b));
-      Decoder D(b,data,m_ts);
-      D.decode();
+        Buffer b(m_buffer.GetEndian());
+        std::copy(m_buffer.position(), m_buffer.position() + ItemLength, std::back_inserter(b));
+        Decoder D(b, data, m_ts);
+        D.decode();
 
-      //buffer_.position()+=ItemLength;
-      m_buffer.increment(ItemLength);
+        m_buffer.increment(ItemLength);
 
-      if(BytesLeftToRead!=UNDEFINED_LENGTH)
-      BytesLeftToRead-=ItemLength;
+        if (BytesLeftToRead != UNDEFINED_LENGTH)
+        {
+          BytesLeftToRead-=ItemLength;
+        }
       }
       else
       {
-      /*
-      Just feed in current buffer and trust system to correctly increment I
-      */
+        /*
+        Just feed in current buffer and trust system to correctly increment I
+        */
 
-      Buffer::iterator I=m_buffer.position();
-      Decoder D(m_buffer,data,m_ts);
+        Buffer::iterator I = m_buffer.position();
+        Decoder D(m_buffer, data, m_ts);
 
-      D.decode();
+        D.decode();
 
+        std::uint32_t BytesRead = m_buffer.position() - I;
 
-      UINT32 BytesRead=m_buffer.position()-I;
-
-      if(BytesLeftToRead!=UNDEFINED_LENGTH)
-      BytesLeftToRead-=BytesRead;
-
+        if(BytesLeftToRead!=UNDEFINED_LENGTH)
+        {
+          BytesLeftToRead-=BytesRead;
+        }
       }
 
       sequence.push_back(data);
-      if(BytesLeftToRead==0)
+      if (BytesLeftToRead == 0)
       {
+        m_dataset.put<VR_SQ>(SequenceTag, sequence);
 
-      m_dataset.put<VR_SQ>(SequenceTag,sequence);
-
-      return;
+        return;
       }
       }
       break;
       case TAG_SEQ_DELIM_ITEM:
       //maybe check that length is 0x00000000
-      if(ItemLength!=0)
-      std::cout<<"sequence delimination item length should really be zero." << std::endl;
+      if (ItemLength != 0)
+      {
+        std::cout<<"sequence delimination item length should really be zero." << std::endl;
+      }
 
       //we're done
 
@@ -329,8 +331,8 @@ namespace dicom
 
       return;
       default:
-      std::cout << "some funny tag in DecodeSequence() :" << tag << std::endl;
-      throw UnknownTag(tag);
+        std::cout << "some funny tag in DecodeSequence() :" << tag << std::endl;
+        throw UnknownTag(tag);
       }
     }
 

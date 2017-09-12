@@ -1,5 +1,6 @@
 set(dicomlib_src_files
   main.cpp
+  lib/Buffer.cpp
   lib/Decoder.cpp
   lib/Encoder.cpp
   lib/File.cpp
@@ -11,7 +12,6 @@ set(dicomlib_src_files
   lib/Utility.cpp
   lib/FileMetaInformation.cpp
   lib/TransferSyntax.cpp
-  lib/Buffer.cpp
   lib/DataDictionary.cpp
   lib/Dumper.cpp
   lib/GroupLength.cpp
@@ -31,6 +31,7 @@ set(dicomlib_src_files
 )
 
 set(dicom_header_files
+  lib/Buffer.hpp
   lib/Decoder.hpp
   lib/Encoder.hpp
   lib/File.hpp
@@ -47,7 +48,6 @@ set(dicom_header_files
   lib/FileMetaInformation.hpp
   lib/TransferSyntax.hpp
   lib/ImplementationUID.hpp
-  lib/Buffer.hpp
   lib/DataDictionary.hpp
   lib/Dumper.hpp
   lib/GroupLength.hpp

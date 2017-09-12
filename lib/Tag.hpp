@@ -524,15 +524,25 @@ namespace dicom
 	/*!
 	See e.g. Part5, Section 7.5.1
 	*/
-	const UINT32 UNDEFINED_LENGTH=0xffffffff;
+	const std::uint32_t UNDEFINED_LENGTH = 0xffffffff;
 
 	//typedef std::vector<Tag> TagVector;
 	//Tags are represented as two words.
 	//think there is a better name for these?
-	inline UINT16 GroupTag(Tag tag) { return UINT16(tag >> 16); }
-	inline UINT16 ElementTag(Tag tag) { return UINT16(tag); }
-	inline Tag makeTag(UINT16 gggg, UINT16 eeee) {
-		return Tag((UINT32(gggg) << 16) | eeee); }
+	inline std::uint16_t GroupTag(Tag tag)
+        {
+          return std::uint16_t(tag >> 16);
+        }
+
+	inline std::uint16_t ElementTag(Tag tag)
+        {
+          return std::uint16_t(tag);
+        }
+
+        inline Tag makeTag(std::uint16_t gggg, std::uint16_t eeee)
+        {
+          return Tag((std::uint32_t(gggg) << 16) | eeee);
+        }
 
 	//should this stuff really be in this file?
 	//why does it appear that we're flipping the Tag data?
@@ -547,13 +557,16 @@ namespace dicom
 	return buf;
 	}
 	*/
-	struct TagMask : public std::pair<UINT32,UINT32>
+        struct TagMask : public std::pair<std::uint32_t, std::uint32_t>
 	{
-		TagMask(UINT32 tag, UINT32 mask) : std::pair<UINT32,UINT32>(tag, mask) {}
+          TagMask(std::uint32_t tag, std::uint32_t mask) :
+            std::pair<std::uint32_t, std::uint32_t>(tag, mask)
+            {
+            }
 	};
 
-	const TagMask TAG_CURVE_DATA	(0x50003000,0xff00ffff);
-	const TagMask TAG_OVERLAY_DATA	(0x60003000,0xff00ffff);
+	const TagMask TAG_CURVE_DATA (0x50003000, 0xff00ffff);
+	const TagMask TAG_OVERLAY_DATA (0x60003000, 0xff00ffff);
 
 	inline bool operator==(const Tag& tag, const TagMask& mask)
 	{
@@ -578,7 +591,7 @@ namespace dicom
 	//should probably split this into N and C commands.
 	namespace Command
 	{
-		typedef UINT16 Code;
+		typedef std::uint16_t Code;
 		const Code
 			//C
 			C_STORE_RQ			= 0x0001,	C_STORE_RSP			= 0x8001,
@@ -598,7 +611,7 @@ namespace dicom
 	}
 	namespace Priority
 	{
-		typedef UINT16 Code;
+          typedef std::uint16_t Code;
 		const Code
 			LOW    = 0x0002,
 			MEDIUM = 0x0000,
@@ -607,7 +620,7 @@ namespace dicom
 
 	namespace DataSetStatus
 	{
-		typedef UINT16 Code;
+          typedef std::uint16_t Code;
 		const Code
 			NO_DATA_SET		= 0x0101,
 			YES_DATA_SET  	= 0x0102;
@@ -617,7 +630,7 @@ namespace dicom
 	//!See also Part 4, Annex C Table C.4-2
 	namespace Status
 	{
-		typedef UINT16 Code;
+          typedef std::uint16_t Code;
 		const Code
 			SUCCESS       	 	= 0x0000,
 			UNKNOWN_SOP_CLASS 	= 0x0122,

@@ -1,89 +1,58 @@
 /************************************************************************
-*	DICOMLIB
-*	Copyright 2003 Sunnybrook and Women's College Health Science Center
-*	Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
+* DICOMLIB
+* Copyright 2003 Sunnybrook and Women's College Health Science Center
+* Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
 *
-*	See LICENSE.txt for copyright and licensing info.
+* See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
-#include	"Utility.hpp"
 #include <algorithm>
+#include <cctype>
 
+#include "Utility.hpp"
 
 void StripTrailingWhitespace(std::string& str)
 {
-	std::string::size_type last=str.find_last_not_of(' ');
-	if(last==std::string::npos)
-		last=0;
-	else
-		last++;
-	
-	str.resize(last);
+  str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
 
+  /*
+  Technically speaking, we shouldn't have to do this, but we have
+  encountered some GE images that have NULLS at the end of strings
+  rather than whitespace.
 
-	/*
-		Technically speaking, we shouldn't have to do this, but we have
-		encountered some GE images that have NULLS at the end of strings
-		rather than whitespace.
-	
-	*/
-	StripTrailingNull(str);
-	
+  */
+  StripTrailingNull(str);
 }
 
 
 void StripTrailingNull(std::string& str)
 {
-	std::string::size_type last=str.find_last_not_of('\0');
-	if(last==std::string::npos)
-		last=0;
-	else
-		last++;
-	str.resize(last);
+  str.erase(remove_if(str.begin(), str.end(),
+    [](std::uint8_t& ch) -> bool
+    {
+      return ch == '\0';
+    }
+    ), str.end());
 }
 
 bool IsDigitString(std::string& str)
 {
-	for(std::string::const_iterator I=str.begin(); I!=str.end(); I++)
-		if(isdigit(*I)==0)
-			return false;
-
-	return true;
+  return std::all_of(str.begin(), str.end(), isdigit);
 }
-
-
-unsigned	long	uniqid = 1;
-
 
 /*
-	Occasionaly the standard calls for a number unique to a given
-	association (see e.g. Part 8, Section 7.1.1.13)
+Occasionaly the standard calls for a number unique to a given
+association (see e.g. Part 8, Section 7.1.1.13)
 
-	The implementation here is insufficiently robust - the above variable
-	'uniqid' should be a member of the object responsible for negotiating
-	the association.
+The implementation here is insufficiently robust - the above variable
+'uniqid' should be a member of the object responsible for negotiating
+the association.
 */
 
-
-
-//UINT8	uniq8()
-//{
-//	return((uniqid++)%0xff);
-//}
-//
-//UINT8	uniq8odd()
-//{
-//	if(uniqid & 0x01)
-//		return((uniqid++)%0xff);
-//	++uniqid;
-//	return((uniqid++)%0xff);
-//}
-
-UINT16	uniq16odd()
+std::uint16_t getMessageID()
 {
-	if(uniqid & 0x01)
-		return((uniqid++)%0xffff);
-	++uniqid;
-	return((uniqid++)%0xffff);
-}
+  static std::uint16_t messageID = 1;
+  ++messageID;
 
+  return messageID;
+}

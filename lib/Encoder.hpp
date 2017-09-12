@@ -2,9 +2,9 @@
 
 #include <exception>
 
+#include "Buffer.hpp"
 #include "DataSet.hpp"
 #include "TransferSyntax.hpp"
-#include "Buffer.hpp"
 
 /*
   As the following class basically only performs one job,
@@ -14,9 +14,7 @@
 
 namespace dicom
 {
-  struct EncoderError : public std::exception{};
-
-  UINT32 WriteToBuffer(const DataSet& data, Buffer& buffer, TS transfer_syntax);
+  std::uint32_t WriteToBuffer(const DataSet& data, Buffer& buffer, TS transfer_syntax);
 
   class Encoder
   {
@@ -27,23 +25,23 @@ namespace dicom
   public:
 
     Encoder(Buffer& buffer, const DataSet& ds, TS ts);
-    UINT32 encode();
+    std::uint32_t encode();
 
   private:
     
-    UINT32 encodeElement(const DataSet::value_type& element) const;
-    UINT32 writeLengthAndVR(UINT32 length, VR vr);
-    UINT32 sendRange(DataSet::const_iterator Begin, DataSet::const_iterator End);
-    UINT32 sendSequenceItemInExplicitLength(Buffer& B, const DataSet& SqItem);
-    UINT32 sendSequence(const Sequence& sequence, bool explicit_length = true);
-    UINT32 sendAttributeTag(DataSet::const_iterator Begin, DataSet::const_iterator End);
-    UINT32 sendUID(DataSet::const_iterator Begin, DataSet::const_iterator End);
-    UINT32 sendOB(DataSet::const_iterator Begin, DataSet::const_iterator End);
+    std::uint32_t encodeElement(const DataSet::value_type& element) const;
+    std::uint32_t writeLengthAndVR(std::uint32_t length, VR vr);
+    std::uint32_t sendRange(DataSet::const_iterator Begin, DataSet::const_iterator End);
+    std::uint32_t sendSequenceItemInExplicitLength(Buffer& B, const DataSet& SqItem);
+    std::uint32_t sendSequence(const Sequence& sequence, bool explicit_length = true);
+    std::uint32_t sendAttributeTag(DataSet::const_iterator Begin, DataSet::const_iterator End);
+    std::uint32_t sendUID(DataSet::const_iterator Begin, DataSet::const_iterator End);
+    std::uint32_t sendOB(DataSet::const_iterator Begin, DataSet::const_iterator End);
 
     template<VR vr>
-    UINT32 sendFundamentalType(DataSet::const_iterator Begin, DataSet::const_iterator End)
+    std::uint32_t sendFundamentalType(DataSet::const_iterator Begin, DataSet::const_iterator End)
     {
-      UINT32 sentlength = 0;
+      std::uint32_t sentlength = 0;
 
       typedef typename TypeFromVR<vr>::Type Type;
       BOOST_STATIC_ASSERT(boost::is_fundamental<Type>::value);
@@ -59,7 +57,7 @@ namespace dicom
         vv.push_back(Begin->second);
       }
       
-      UINT32 Length = (UINT32)vv.size();//Should be identical to End-Begin, but we don't have subtraction operator available.
+      std::uint32_t Length = (std::uint32_t)vv.size();//Should be identical to End-Begin, but we don't have subtraction operator available.
       sentlength += writeLengthAndVR(sizeof(Type) * Length, vr);
 
       for (size_t i = 0; i < vv.size(); i++)
@@ -74,9 +72,9 @@ namespace dicom
     }
 
     template <VR vr>
-    UINT32 sendString(DataSet::const_iterator Begin, DataSet::const_iterator End)
+    std::uint32_t sendString(DataSet::const_iterator Begin, DataSet::const_iterator End)
     {
-      UINT32 sentlength = 0;
+      std::uint32_t sentlength = 0;
 
       StaticVRCheck<std::string, vr>();
 
@@ -108,7 +106,7 @@ namespace dicom
         StringToSend.append(1, ' ');//string length must be even.
       }
         
-      sentlength += writeLengthAndVR((UINT32)StringToSend.size(), vr);
+      sentlength += writeLengthAndVR((std::uint32_t)StringToSend.size(), vr);
       m_buffer << StringToSend;
       sentlength += StringToSend.length();
 

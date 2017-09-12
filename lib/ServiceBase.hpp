@@ -2,7 +2,6 @@
 #define SERVICE_BASE_HPP_23847239487238
 #include <string>
 
-#include "Buffer.hpp"
 #include "DataSet.hpp"
 #include "TransferSyntax.hpp"
 #include "pdata.hpp"

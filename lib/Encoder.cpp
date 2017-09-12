@@ -19,10 +19,10 @@ namespace dicom
   {
   }
   
-  UINT32 Encoder::sendAttributeTag(DataSet::const_iterator Begin, DataSet::const_iterator End)
+  std::uint32_t Encoder::sendAttributeTag(DataSet::const_iterator Begin, DataSet::const_iterator End)
   {
-    UINT32 sentlength = 0;
-    UINT32 Length = (UINT32)m_dataset.count(Begin->first);//Should be identical to End-Begin, but we don't have subtraction operator available.
+    std::uint32_t sentlength = 0;
+    std::uint32_t Length = (std::uint32_t)m_dataset.count(Begin->first);//Should be identical to End-Begin, but we don't have subtraction operator available.
     
     sentlength += writeLengthAndVR(sizeof(Tag) * Length, VR_AT);
     
@@ -37,11 +37,11 @@ namespace dicom
     return sentlength;
   }
   
-  UINT32 Encoder::sendUID(DataSet::const_iterator Begin, DataSet::const_iterator End)
+  std::uint32_t Encoder::sendUID(DataSet::const_iterator Begin, DataSet::const_iterator End)
   {
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
     
-    Tag tag=Begin->first;
+    Tag tag = Begin->first;
     
     std::string StringToSend;
     for(; Begin != End; Begin++)
@@ -66,16 +66,16 @@ namespace dicom
       StringToSend.append(1, '\0'); //length must be even, NULL character is used for padding UIDs
     }
     
-    sentlength += writeLengthAndVR((UINT32)StringToSend.size(), VR_UI);
+    sentlength += writeLengthAndVR((std::uint32_t)StringToSend.size(), VR_UI);
     m_buffer << StringToSend;
     sentlength += StringToSend.length();
     
     return sentlength;
   }
   
-  UINT32 Encoder::sendOB(DataSet::const_iterator Begin, DataSet::const_iterator End)
+  std::uint32_t Encoder::sendOB(DataSet::const_iterator Begin, DataSet::const_iterator End)
   {
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
     typedef TypeFromVR<VR_OB>::Type Type;
     
     Tag tag = Begin->first;
@@ -87,7 +87,7 @@ namespace dicom
     if(1 == fragments)//just send the data
     {
       const Type& ByteVector = Begin->second.Get<Type>();
-      sentlength += writeLengthAndVR((UINT32)ByteVector.size(), VR_OB);
+      sentlength += writeLengthAndVR((std::uint32_t)ByteVector.size(), VR_OB);
       m_buffer.AddVector(ByteVector);
       sentlength += ByteVector.size();
     }
@@ -99,8 +99,8 @@ namespace dicom
       
       m_buffer << TAG_ITEM;
       sentlength += sizeof(Tag);
-      m_buffer << UINT32(0x00); //no offset table.
-      sentlength += sizeof(UINT32);
+      m_buffer << std::uint32_t(0x00); //no offset table.
+      sentlength += sizeof(std::uint32_t);
       
       for(;Begin != End; Begin++)
       {
@@ -108,8 +108,8 @@ namespace dicom
         sentlength += sizeof(Tag);
         
         const Type& ByteVector = Begin->second.Get<Type>();
-        m_buffer << UINT32(ByteVector.size());
-        sentlength += sizeof(UINT32);
+        m_buffer << std::uint32_t(ByteVector.size());
+        sentlength += sizeof(std::uint32_t);
         
         m_buffer.AddVector(ByteVector);
         sentlength += ByteVector.size();
@@ -117,18 +117,18 @@ namespace dicom
       
       m_buffer << TAG_SEQ_DELIM_ITEM;
       sentlength += sizeof(Tag);
-      m_buffer << UINT32(0x00);
-      sentlength += sizeof(UINT32);
+      m_buffer << std::uint32_t(0x00);
+      sentlength += sizeof(std::uint32_t);
     }
     
     return sentlength;
   }
   
-  UINT32 Encoder::sendRange(DataSet::const_iterator Begin, DataSet::const_iterator End)
+  std::uint32_t Encoder::sendRange(DataSet::const_iterator Begin, DataSet::const_iterator End)
   {
     //we might want an ASSERT here to check that the range truly is consistent,
     //i.e. only consists of elements sharing the same Tag and VR...
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
     Tag tag = Begin->first;
     VR vr = Begin->second.vr();
 
@@ -181,7 +181,7 @@ namespace dicom
           typedef TypeFromVR<VR_OW>::Type Type;
           const Type& WordVector = Begin->second.Get<Type>();
 
-          UINT32 ByteLength = WordVector.size() * 2;
+          std::uint32_t ByteLength = WordVector.size() * 2;
           sentlength += writeLengthAndVR(ByteLength, VR_OW);
 
           m_buffer.AddVector(WordVector);
@@ -222,7 +222,7 @@ namespace dicom
         {
           typedef TypeFromVR<VR_UN>::Type Type;
           const Type& ByteVector = Begin->second.Get<Type>();
-          sentlength += writeLengthAndVR((UINT32)ByteVector.size(), VR_UN);
+          sentlength += writeLengthAndVR((std::uint32_t)ByteVector.size(), VR_UN);
           m_buffer.AddVector(ByteVector);
           sentlength += ByteVector.size();
         }
@@ -241,42 +241,42 @@ namespace dicom
     return sentlength;
   }
 
-  UINT32 Encoder::writeLengthAndVR(UINT32 length, VR vr)
+  std::uint32_t Encoder::writeLengthAndVR(std::uint32_t length, VR vr)
   {
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
 
     if (m_ts.isExplicitVR())
     {
-      m_buffer << BYTE(vr); //byte 1 -Sam
-      m_buffer << BYTE(vr >> 8); //byte 2 -Sam
+      m_buffer << std::uint8_t(vr); //byte 1 -Sam
+      m_buffer << std::uint8_t(vr >> 8); //byte 2 -Sam
       sentlength += 2;
 
       if (VR_UN == vr || VR_SQ == vr || VR_OW == vr || VR_OB == vr || VR_UT == vr)
       {
-        m_buffer << UINT16(0); //reserved
-        sentlength += sizeof(UINT16);
+        m_buffer << std::uint16_t(0); //reserved
+        sentlength += sizeof(std::uint16_t);
         m_buffer << length; //4 bytes
-        sentlength += sizeof(UINT32);
+        sentlength += sizeof(std::uint32_t);
       }
       else
       {
-        m_buffer << UINT16(length); //2 bytes
-        sentlength += sizeof(UINT16);
+        m_buffer << std::uint16_t(length); //2 bytes
+        sentlength += sizeof(std::uint16_t);
       }
     }
     else
     {
       //no VR info sent
       m_buffer << length; //4 bytes
-      sentlength += sizeof(UINT32);
+      sentlength += sizeof(std::uint32_t);
     }
 
     return sentlength;
   }
 
-  UINT32 Encoder::encode()
+  std::uint32_t Encoder::encode()
   {
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
     DataSet::const_iterator I = m_dataset.begin();
 
     while(I != m_dataset.end())
@@ -307,9 +307,9 @@ namespace dicom
   new buffer to the original buffer. -Sam Shen
   */
 
-  UINT32 Encoder::sendSequenceItemInExplicitLength(Buffer& B, const DataSet& SqItem)
+  std::uint32_t Encoder::sendSequenceItemInExplicitLength(Buffer& B, const DataSet& SqItem)
   {
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
     int ByteOrder = m_ts.isBigEndian() ? __BIG_ENDIAN : __LITTLE_ENDIAN;
     Buffer tmp(ByteOrder);
 
@@ -324,14 +324,14 @@ namespace dicom
     return sentlength;
   }
 
-  UINT32 Encoder::sendSequence(const Sequence& sequence, bool explicit_length)
+  std::uint32_t Encoder::sendSequence(const Sequence& sequence, bool explicit_length)
   {
     if (sequence.size() == 0)
     {
-      return writeLengthAndVR(UINT32(0), VR_SQ);
+      return writeLengthAndVR(std::uint32_t(0), VR_SQ);
     }
 
-    UINT32 sentlength = 0;
+    std::uint32_t sentlength = 0;
     if (!explicit_length)
     {
       writeLengthAndVR(UNDEFINED_LENGTH, VR_SQ);
@@ -348,11 +348,11 @@ namespace dicom
         E.encode();
 
         m_buffer << TAG_ITEM_DELIM_ITEM;
-        m_buffer << UINT32(0x00);
+        m_buffer << std::uint32_t(0x00);
       }
 
       m_buffer << TAG_SEQ_DELIM_ITEM;
-      m_buffer << UINT32(0x00);
+      m_buffer << std::uint32_t(0x00);
       return UNDEFINED_LENGTH;
     }
     else//explicit length
@@ -378,7 +378,7 @@ namespace dicom
     }
   }
 
-  UINT32 WriteToBuffer(const DataSet& data, Buffer& buffer, TS transfer_syntax)
+  std::uint32_t WriteToBuffer(const DataSet& data, Buffer& buffer, TS transfer_syntax)
   {
     Encoder E(buffer, data, transfer_syntax);
     return E.encode();

@@ -93,13 +93,23 @@ namespace dicom
 		}
 	};
 	//!System got passed a value that isn't a valid VR or we don't know how to handle...
-	struct UnknownVR:public dicom::exception
+	class UnknownVR : public dicom::exception
 	{
-		UINT32 vr_;
-		UnknownVR():dicom::exception("Unknown VR"),vr_(0)
-		{
-		}
-		UnknownVR(UINT32 vr):dicom::exception("Unknown VR"),vr_(vr){}
+          std::uint32_t m_vr;
+
+        public:
+          
+          UnknownVR() :
+            dicom::exception("Unknown VR"),
+            m_vr(0)
+          {
+          }
+
+          UnknownVR(std::uint32_t vr) :
+            dicom::exception("Unknown VR"),
+            m_vr(vr)
+            {
+            }
 	};
 
 	//!Retrieval of c++ type from DICOM Value Representation
@@ -159,8 +169,8 @@ namespace dicom
 	template<> struct TypeFromVR<VR_IS>{typedef	std::string					Type;	};//please replace
 	template<> struct TypeFromVR<VR_LO>{typedef	std::string					Type;	};
 	template<> struct TypeFromVR<VR_LT>{typedef	std::string					Type;	};
-	template<> struct TypeFromVR<VR_OB>{typedef	std::vector<BYTE>			Type;	};
-	template<> struct TypeFromVR<VR_OW>{typedef	std::vector<UINT16>			Type;	};
+	template<> struct TypeFromVR<VR_OB>{typedef	std::vector<std::uint8_t>			Type;	};
+        template<> struct TypeFromVR<VR_OW>{typedef	std::vector<std::uint16_t>			Type;	};
 	template<> struct TypeFromVR<VR_PN>{typedef	std::string					Type;	};
 	template<> struct TypeFromVR<VR_SH>{typedef	std::string					Type;	};//please replace.
 	template<> struct TypeFromVR<VR_SL>{typedef	signed int					Type;	};//Here we use int not long as long is sometimes 64 bits, and VR_SL _must_ be 32 bits
@@ -173,9 +183,9 @@ namespace dicom
 	template<> struct TypeFromVR<VR_ST>{typedef	std::string					Type;	};
 	template<> struct TypeFromVR<VR_TM>{typedef	std::string					Type;	};//please replace.
 	template<> struct TypeFromVR<VR_UI>{typedef	UID							Type;	};
-	template<> struct TypeFromVR<VR_UL>{typedef UINT32			 			Type;	};
-	template<> struct TypeFromVR<VR_UN>{typedef	std::vector<BYTE>			Type;	};// a string of bytes, don't know what else to do with it
-	template<> struct TypeFromVR<VR_US>{typedef	UINT16						Type;	};
+        template<> struct TypeFromVR<VR_UL>{typedef     std::uint32_t	 		 			Type;	};
+        template<> struct TypeFromVR<VR_UN>{typedef	std::vector<std::uint8_t>			Type;	};// a string of bytes, don't know what else to do with it
+        template<> struct TypeFromVR<VR_US>{typedef	std::uint16_t						Type;	};
 	template<> struct TypeFromVR<VR_UT>{typedef	std::string					Type;	};
 	/*
 		//are there any left?

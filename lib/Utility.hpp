@@ -1,9 +1,7 @@
-#ifndef UTILITY_HPP_INCLUDE_GUARD_45475351328
-#define UTILITY_HPP_INCLUDE_GUARD_45475351328
+#pragma once
+
 #include <string>
-#include <limits>
-#include <boost/type_traits.hpp>
-#include <boost/static_assert.hpp>
+
 #include "Types.hpp"
 
 //these should be in dicom namespace
@@ -20,29 +18,35 @@ bool IsDigitString(std::string& str);
 template <typename T>
 struct Series
 {
-	T CurrentValue_;
-	Series():CurrentValue_(0){}
-	T operator()()
-	{
-		return CurrentValue_++;
-	}
+  T m_currentValue;
+
+  Series() :
+    m_currentValue(0)
+  {
+  }
+
+  T operator()()
+  {
+    return m_currentValue++;
+  }
 };
 
 template <typename T>
 struct OddSeries
 {
-	T CurrentValue_;
-	OddSeries():CurrentValue_(1){}
-	T operator()()
-	{
-		T ret=CurrentValue_;
-		CurrentValue_+=2;
-		return ret;
-	}
+  T m_currentValue;
+
+  OddSeries() :
+    m_currentValue(1)
+  {
+  }
+
+  T operator()()
+  {
+    T ret = m_currentValue;
+    m_currentValue += 2;
+    return ret;
+  }
 };
 
-//UINT8		uniq8();
-//UINT8		uniq8odd();
-UINT16		uniq16odd();
-
-#endif //UTILITY_HPP_INCLUDE_GUARD_45475351328
+std::uint16_t getMessageID();

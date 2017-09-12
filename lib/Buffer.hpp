@@ -2,8 +2,11 @@
 
 #include <queue>
 #include <vector>
+#include <algorithm>
 
 #include <boost/utility.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits.hpp>
 
 #include "Types.hpp"
 #include "Exceptions.hpp"
@@ -52,15 +55,15 @@ namespace dicom
   */
   //!Thrown if Read beyond buffer.
 
-  struct ReadBeyondBuffer : public dicom::exception
+  class ReadBeyondBuffer : public dicom::exception
   {
-    ReadBeyondBuffer(std::string what = "read beyond buffer") :
-      dicom::exception(what) {}
-
-    virtual ~ReadBeyondBuffer() throw(){}
+  public:
+    
+    ReadBeyondBuffer(std::string what = "read beyond buffer");
+    virtual ~ReadBeyondBuffer() throw();
   };
 
-  class Buffer : public std::vector<BYTE>, boost::noncopyable
+  class Buffer : public std::vector<std::uint8_t>, boost::noncopyable
   {
     /*!
     We keep track of position using this variable rather than
@@ -68,92 +71,52 @@ namespace dicom
     by insertions. I'm not very happy about this.
     */
 
-    size_type m_I;
+    size_type m_currentIndex;
     int m_externalByteOrder;
 
   public:
 
-    Buffer() :
-      m_I(0),
-      m_externalByteOrder(__LITTLE_ENDIAN)
-    {
-    }
+    Buffer();
+    Buffer(int ExternalByteOrder);
 
-    Buffer(int ExternalByteOrder) :
-      m_I(0),
-      m_externalByteOrder(ExternalByteOrder)
-    {
-    }
-
-    void SetEndian(int endian)
-    {
-      m_externalByteOrder = endian;
-    }
-
-    int GetEndian()
-    {
-      return m_externalByteOrder;
-    }
+    void SetEndian(int endian);
+    int GetEndian();
 
     iterator position();
     void increment(size_type i);
 
     Buffer& operator << (std::string data);
-
-    template <typename T>
-    Buffer& operator << (T data)
-    {
-      BOOST_STATIC_ASSERT(::boost::is_fundamental<T>::value);//because we're treating it as a byte stream.
-
-      if (m_externalByteOrder != __BYTE_ORDER && sizeof(T) != 1)
-      {
-        data = SwitchEndian<T>(data);
-      }
-
-      BYTE* pdata = reinterpret_cast<BYTE*>(&data);
-      for(BYTE* p = pdata; p < pdata + sizeof(T); p++)
-      {
-        push_back(*p);
-      }
-
-      return *this;
-    }
-
     Buffer& operator << (Tag tag);
+    
+    Buffer& operator << (std::uint8_t data);
+    Buffer& operator << (std::uint16_t data);
+    Buffer& operator << (std::uint32_t data);
+    Buffer& operator << (std::uint64_t data);
+    Buffer& operator << (std::int8_t data);
+    Buffer& operator << (std::int16_t data);
+    Buffer& operator << (std::int32_t data);
+    Buffer& operator << (std::int64_t data);
 
-    template <typename T>
-    Buffer& operator >> (T& data)
-    {
-      BOOST_STATIC_ASSERT(!(::boost::is_const<T>::value));//because we're writing to it.
-      BOOST_STATIC_ASSERT(::boost::is_fundamental<T>::value);//because we're treating it as a byte stream.
+    Buffer& operator << (float data);
+    Buffer& operator << (double data);
 
-      BYTE* pdata = reinterpret_cast<BYTE*>(&data);
-
-      if (int(sizeof(T)) > (end() - position()))
-      {
-        throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
-      }
-
-      for (BYTE* p = pdata; p < pdata + sizeof(T); p++)//this is tedious to have to check.
-      {
-        //can we do this with a copy?
-        *p = *position();
-        m_I++;
-      }
-
-      if (m_externalByteOrder != __BYTE_ORDER && sizeof(T) != 1)
-      {
-        data = SwitchEndian<T>(data);
-      }
-
-      return *this;
-    }
-
-    Buffer& operator >> (std::vector<UINT16>& data);
-    Buffer& operator >> (std::vector<BYTE>& data);
     Buffer& operator >> (std::string& data);
-
     Buffer& operator >> (Tag& tag);
+
+    Buffer& operator >> (std::uint8_t& data);
+    Buffer& operator >> (std::uint16_t& data);
+    Buffer& operator >> (std::uint32_t& data);
+    Buffer& operator >> (std::uint64_t& data);
+    Buffer& operator >> (std::int8_t& data);
+    Buffer& operator >> (std::int16_t& data);
+    Buffer& operator >> (std::int32_t& data);
+    Buffer& operator >> (std::int64_t& data);
+    
+    Buffer& operator >> (float& data);
+    Buffer& operator >> (double& data);
+
+    Buffer& operator >> (std::vector<std::uint16_t>& data);
+    Buffer& operator >> (std::vector<std::uint8_t>& data);
 
     //!Override this to make sure we keep I_ nice.
     void clear();
@@ -163,11 +126,7 @@ namespace dicom
     two functions into a templated one if we really wanted to.
     */
 
-    void AddVector(const std::vector<BYTE>& data)
-    {
-      insert(this->end(), data.begin(), data.end());
-    }
-
-    void AddVector(const std::vector<UINT16>& data);
+    void AddVector(const std::vector<std::uint8_t>& data);
+    void AddVector(const std::vector<std::uint16_t>& data);
   };
 }

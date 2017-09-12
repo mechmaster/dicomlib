@@ -63,8 +63,8 @@ namespace dicom
     
   private:
     
-    void decodeVRAndLength(Tag tag, VR& vr, UINT32& length);
-    void decodeSequence(Tag tag, UINT32 length);
+    void decodeVRAndLength(Tag tag, VR& vr, std::uint32_t& length);
+    void decodeSequence(Tag tag, std::uint32_t length);
     
     /*!
      E x*tract one element onto dataset.
@@ -210,14 +210,14 @@ namespace dicom
         m_buffer >> offset_table_tag;
 
         Enforce(TAG_ITEM == offset_table_tag, "Offset table must be defined in encoded data");
-        UINT32 length;
+        std::uint32_t length;
         m_buffer >> length;
         m_buffer.increment(length);//we ignore the offset table...
 
         for(;;)
         {
           Tag tag;
-          UINT32 length;
+          std::uint32_t length;
           m_buffer >> tag;
           m_buffer >> length;
 
