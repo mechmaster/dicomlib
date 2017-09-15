@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Types.hpp"
+#include "Buffer.hpp"
 
 namespace dicom
 {
@@ -19,46 +20,46 @@ namespace dicom
     */
     class AAssociateRJ
     {
-      static const BYTE m_itemType = 0x03;
-      static const BYTE m_reserved1 = 0x00;
-      static const UINT32 m_length = 0x04;
-      static const BYTE m_reserved2 = 0x00;
+      static const std::uint8_t m_itemType = 0x03;
+      static const std::uint8_t m_reserved1 = 0x00;
+      static const std::uint32_t m_length = 0x04;
+      static const std::uint8_t m_reserved2 = 0x00;
 
     public:
 
-      BYTE m_result;
-      BYTE m_source;
-      BYTE m_reason;
+      std::uint8_t m_result;
+      std::uint8_t m_source;
+      std::uint8_t m_reason;
 
       AAssociateRJ();
-      AAssociateRJ(BYTE Result, BYTE Source, BYTE Reason);
+      AAssociateRJ(std::uint8_t Result, std::uint8_t Source, std::uint8_t Reason);
 
-      void write(Network::Socket&);
-      void readDynamic(Network::Socket&);
+      void write(Buffer& temp);
+      void read(Buffer& temp);
 
       //These could be enums that got converted to BYTEs in the constructor.
 
       //for reference see Part 8/table 9-21
 
       //Result
-      const static BYTE REJECTED_PERMANENT = 1;
-      const static BYTE REJECTED_TRANSIENT = 2;
+      const static std::uint8_t REJECTED_PERMANENT = 1;
+      const static std::uint8_t REJECTED_TRANSIENT = 2;
       //source
-      const static BYTE DICOM_SERVICE_USER = 1;
-      const static BYTE DICOM_SERVICE_PROVIDER_ACSE = 2;
-      const static BYTE DICOM_SERVICE_PROVIDER_PRESENTATION = 3;
+      const static std::uint8_t DICOM_SERVICE_USER = 1;
+      const static std::uint8_t DICOM_SERVICE_PROVIDER_ACSE = 2;
+      const static std::uint8_t DICOM_SERVICE_PROVIDER_PRESENTATION = 3;
       //reason
-      const static BYTE RESERVED = 0;
+      const static std::uint8_t RESERVED = 0;
       //source has value 1
-      const static BYTE NO_REASON = 1;
-      const static BYTE APPLICATION_CONTEXT_NOT_SUPPORTED = 2;
-      const static BYTE CALLING_AE_NOT_RECOGNIZED = 3;
-      const static BYTE CALLED_AE_NOT_RECOGNIZED = 7;
+      const static std::uint8_t NO_REASON = 1;
+      const static std::uint8_t APPLICATION_CONTEXT_NOT_SUPPORTED = 2;
+      const static std::uint8_t CALLING_AE_NOT_RECOGNIZED = 3;
+      const static std::uint8_t CALLED_AE_NOT_RECOGNIZED = 7;
       //source has value 2
-      const static BYTE PROTOCOL_VERSION_NOT_SUPPORTED = 2;
+      const static std::uint8_t PROTOCOL_VERSION_NOT_SUPPORTED = 2;
       //source has value 3
-      const static BYTE TEMPORARY_CONGESTION = 1;
-      const static BYTE LOCAL_LIMIT_EXCEEDED = 2;
+      const static std::uint8_t TEMPORARY_CONGESTION = 1;
+      const static std::uint8_t LOCAL_LIMIT_EXCEEDED = 2;
     };
 
     /*!
@@ -66,15 +67,15 @@ namespace dicom
     */
     class AReleaseRQ
     {
-      const static BYTE m_itemType = 0x05;
-      const static BYTE m_reserved1 = 0x00;
-      const static UINT32 m_length = 0x04;
-      const static UINT32 m_reserved2 = 0x00;
+      const static std::uint8_t m_itemType = 0x05;
+      const static std::uint8_t m_reserved1 = 0x00;
+      const static std::uint32_t m_length = 0x04;
+      const static std::uint32_t m_reserved2 = 0x00;
 
     public:
 
-      void write(Network::Socket&);
-      void readDynamic(Network::Socket&);
+      void write(Buffer& temp);
+      void read(Buffer& temp);
     };
 
     /*!
@@ -82,16 +83,15 @@ namespace dicom
     */
     class AReleaseRP
     {
-      const static BYTE m_itemType = 0x06;
-      const static BYTE m_reserved1 = 0x00;
-      const static UINT32 m_length = 0x04;
-      const static UINT32 m_reserved2 = 0x00;
+      const static std::uint8_t m_itemType = 0x06;
+      const static std::uint8_t m_reserved1 = 0x00;
+      const static std::uint32_t m_length = 0x04;
+      const static std::uint32_t m_reserved2 = 0x00;
 
     public:
 
-      void write(Network::Socket &);
-      void read(Network::Socket &);
-      void readDynamic(Network::Socket &);
+      void write(Buffer& temp);
+      void read(Buffer& temp);
     };
 
     /*!
@@ -100,33 +100,32 @@ namespace dicom
     */
     class AAbortRQ
     {
-      const static BYTE m_itemType = 0x07;
-      const static BYTE m_reserved1 = 0x00;
-      const static UINT32 m_length = 0x04;
-      const static BYTE m_reserved2 = 0x00;
-      const static BYTE m_reserved3 = 0x00;
+      const static std::uint8_t m_itemType = 0x07;
+      const static std::uint8_t m_reserved1 = 0x00;
+      const static std::uint32_t m_length = 0x04;
+      const static std::uint8_t m_reserved2 = 0x00;
+      const static std::uint8_t m_reserved3 = 0x00;
 
     public:
 
-      BYTE m_source;
-      BYTE m_reason;
+      std::uint8_t m_source;
+      std::uint8_t m_reason;
 
-      AAbortRQ(Network::Socket& socket);
-      AAbortRQ(BYTE Source, BYTE Reason);
+      AAbortRQ(std::uint8_t Source, std::uint8_t Reason);
 
-      void write(Network::Socket&);
-      void readDynamic(Network::Socket&);
+      void write(Buffer& temp);
+      void read(Buffer& temp);
 
       //source (who  initiated the abort.)
-      const static BYTE DICOM_SERVICE_USER = 0;
-      const static BYTE DICOM_SERVICE_PROVIDER = 2;
+      const static std::uint8_t DICOM_SERVICE_USER = 0;
+      const static std::uint8_t DICOM_SERVICE_PROVIDER = 2;
       //reason (should be 0 if Source is 0)
-      const static BYTE NO_REASON = 0;
-      const static BYTE UNRECOGNIZED_PDU = 1;
-      const static BYTE UNEXPECTED_PDU = 2;
-      const static BYTE UNRECOGNIZED_PDU_PARAMETER = 4;
-      const static BYTE UNEXPECTED_PDU_PARAMETER = 5;
-      const static BYTE INVALID_PDU_PARAMETER = 6;
+      const static std::uint8_t NO_REASON = 0;
+      const static std::uint8_t UNRECOGNIZED_PDU = 1;
+      const static std::uint8_t UNEXPECTED_PDU = 2;
+      const static std::uint8_t UNRECOGNIZED_PDU_PARAMETER = 4;
+      const static std::uint8_t UNEXPECTED_PDU_PARAMETER = 5;
+      const static std::uint8_t INVALID_PDU_PARAMETER = 6;
     };
   }//namespace primitive
 }//namespace dicom

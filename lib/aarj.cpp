@@ -8,11 +8,7 @@
 
 #include "aarj.hpp"
 #include "aarq.hpp"//for BadItemType
-/*
-NOTE: The 'ReadDynamic' member functions assume that the 'ItemType_' field
-has already been read from the data stream, (hence the PDU type is known.)
 
-*/
 /************************************************************************
 *
 * AAssociateRJ Packet
@@ -27,35 +23,29 @@ namespace dicom
     difference of opinion here between gcc and msvc as to whether constant static members
     need to be instantiated seperately.
     */
-    const BYTE AAssociateRJ::m_itemType;
-    const BYTE AAssociateRJ::m_reserved1;
-    const UINT32 AAssociateRJ::m_length;
-    const BYTE AAssociateRJ::m_reserved2;
+    const std::uint8_t AAssociateRJ::m_itemType;
+    const std::uint8_t AAssociateRJ::m_reserved1;
+    const std::uint32_t AAssociateRJ::m_length;
+    const std::uint8_t AAssociateRJ::m_reserved2;
 
-    const BYTE AReleaseRQ::m_itemType;
-    const BYTE AReleaseRQ::m_reserved1;
-    const UINT32 AReleaseRQ::m_length;
-    const UINT32 AReleaseRQ::m_reserved2;
+    const std::uint8_t AReleaseRQ::m_itemType;
+    const std::uint8_t AReleaseRQ::m_reserved1;
+    const std::uint32_t AReleaseRQ::m_length;
+    const std::uint32_t AReleaseRQ::m_reserved2;
 
-    const BYTE AReleaseRP::m_itemType;
-    const BYTE AReleaseRP::m_reserved1;
-    const UINT32 AReleaseRP::m_length;
-    const UINT32 AReleaseRP::m_reserved2;
+    const std::uint8_t AReleaseRP::m_itemType;
+    const std::uint8_t AReleaseRP::m_reserved1;
+    const std::uint32_t AReleaseRP::m_length;
+    const std::uint32_t AReleaseRP::m_reserved2;
 
-    const BYTE AAbortRQ::m_itemType;
-    const BYTE AAbortRQ::m_reserved1;
-    const UINT32 AAbortRQ::m_length;
-    const BYTE AAbortRQ::m_reserved2;
-    const BYTE AAbortRQ::m_reserved3;
+    const std::uint8_t AAbortRQ::m_itemType;
+    const std::uint8_t AAbortRQ::m_reserved1;
+    const std::uint32_t AAbortRQ::m_length;
+    const std::uint8_t AAbortRQ::m_reserved2;
+    const std::uint8_t AAbortRQ::m_reserved3;
 #endif
 
-    namespace
-    {
-      BYTE tmpBYTE;
-      UINT32 tmpUINT32;
-    }
-
-    AAssociateRJ::AAssociateRJ(BYTE Result, BYTE Source, BYTE Reason) :
+    AAssociateRJ::AAssociateRJ(std::uint8_t Result, std::uint8_t Source, std::uint8_t Reason) :
       m_result(Result),
       m_source(Source),
       m_reason(Reason)
@@ -67,26 +57,31 @@ namespace dicom
     }
 
 
-    void AAssociateRJ::write(Network::Socket& socket)
+    void AAssociateRJ::write(Buffer& temp)
     {
-      socket << m_itemType;
-      socket << m_reserved1;
-      socket << m_length;
-      socket << m_reserved2;
-      socket << m_result;
-      socket << m_source;
-      socket << m_reason;
+      temp << m_itemType;
+      temp << m_reserved1;
+      temp << m_length;
+      temp << m_reserved2;
+      temp << m_result;
+      temp << m_source;
+      temp << m_reason;
     }
 
-    void AAssociateRJ::readDynamic(Network::Socket& socket)
+    void AAssociateRJ::read(Buffer& temp)
     {
-      socket >> tmpBYTE; // m_itemType;
-      socket >> tmpBYTE; // m_reserved1;
-      socket >> tmpUINT32; // m_length;
-      socket >> tmpBYTE; // m_reserved2;
-      socket >> m_result;
-      socket >> m_source;
-      socket >> m_reason;
+      std::uint8_t b;
+      std::uint32_t bbbb;
+      
+      temp >> b;
+      EnforceItemType(b, m_itemType);
+      
+      temp >> b; // m_reserved1;
+      temp >> bbbb; // m_length;
+      temp >> b; // m_reserved2;
+      temp >> m_result;
+      temp >> m_source;
+      temp >> m_reason;
     }
 
     /************************************************************************
@@ -95,22 +90,28 @@ namespace dicom
     *
     ************************************************************************/
 
-    void AReleaseRQ::write(Network::Socket& socket)
+    void AReleaseRQ::write(Buffer& temp)
     {
-      socket << m_itemType;
-      socket << m_reserved1;
-      socket << m_length;
-      socket << m_reserved2;
+      temp << m_itemType;
+      temp << m_reserved1;
+      temp << m_length;
+      temp << m_reserved2;
     }
 
     /*!
     Section 8, table 9.3.7
     */
-    void AReleaseRQ::readDynamic(Network::Socket& socket)
+    void AReleaseRQ::read(Buffer& temp)
     {
-      socket >> tmpBYTE;
-      socket >> tmpUINT32;//should be 4 but we don't bother checking.
-      socket >> tmpUINT32;
+      std::uint8_t b;
+      std::uint32_t bbbb;
+      
+      temp >> b;
+      EnforceItemType(b, m_itemType);
+      
+      temp >> b;
+      temp >> bbbb;//should be 4 but we don't bother checking.
+      temp >> bbbb;
     }
 
     /************************************************************************
@@ -119,27 +120,25 @@ namespace dicom
     *
     ************************************************************************/
 
-    void AReleaseRP::write(Network::Socket& socket)
+    void AReleaseRP::write(Buffer& temp)
     {
-      socket << m_itemType;
-      socket << m_reserved1;
-      socket << m_length;
-      socket << m_reserved2;
+      temp << m_itemType;
+      temp << m_reserved1;
+      temp << m_length;
+      temp << m_reserved2;
     }
 
-    void AReleaseRP::read(Network::Socket& socket)
+    void AReleaseRP::read(Buffer& temp)
     {
-      BYTE b;
-      socket >> b;
+      std::uint8_t b;
+      std::uint32_t bbbb;
+      
+      temp >> b;
       EnforceItemType(b, m_itemType);
-      readDynamic(socket);
-    }
 
-    void AReleaseRP::readDynamic(Network::Socket& socket)
-    {
-      socket >> tmpBYTE;
-      socket >> tmpUINT32;
-      socket >> tmpUINT32;
+      temp >> b;
+      temp >> bbbb;
+      temp >> bbbb;
     }
 
     /************************************************************************
@@ -155,37 +154,37 @@ namespace dicom
     follows.  
     */
 
-    AAbortRQ::AAbortRQ(Network::Socket& socket)
-    {
-      //must have already read ItemType_ from stream!
-      readDynamic(socket);
-    }
-
-    AAbortRQ::AAbortRQ(BYTE Source, BYTE Reason) :
+    AAbortRQ::AAbortRQ(std::uint8_t Source, std::uint8_t Reason) :
       m_source(Source),
       m_reason(Reason)
     {
     }
 
-    void AAbortRQ::write(Network::Socket& socket)
+    void AAbortRQ::write(Buffer& temp)
     {
-      socket << m_itemType;
-      socket << m_reserved1;
-      socket << m_length;
-      socket << m_reserved2;
-      socket << m_reserved3;
-      socket << m_source;
-      socket << m_reason;
+      temp << m_itemType;
+      temp << m_reserved1;
+      temp << m_length;
+      temp << m_reserved2;
+      temp << m_reserved3;
+      temp << m_source;
+      temp << m_reason;
     }
 
-    void AAbortRQ::readDynamic(Network::Socket& socket)
+    void AAbortRQ::read(Buffer& temp)
     {
-      socket >> tmpBYTE;
-      socket >> tmpUINT32;
-      socket >> tmpBYTE;
-      socket >> tmpBYTE;
-      socket >> m_source;
-      socket >> m_reason;
+      std::uint8_t b;
+      std::uint32_t bbbb;
+      
+      temp >> b;
+      EnforceItemType(b, m_itemType);
+
+      temp >> b;
+      temp >> bbbb;
+      temp >> b;
+      temp >> b;
+      temp >> m_source;
+      temp >> m_reason;
     }
   }//namespace primitive
 }//namespace dicom

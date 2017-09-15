@@ -27,88 +27,64 @@ namespace dicom
     need to be instantiated seperately from their declaration..
     (Are we sure about this?)
     */
-    const BYTE PresentationContextAccept::m_itemType;
-    const BYTE PresentationContextAccept::m_reserved1;
-    const BYTE PresentationContextAccept::m_reserved2;
-    const BYTE PresentationContextAccept::m_reserved4;
+    const std::uint8_t PresentationContextAccept::m_itemType;
+    const std::uint8_t PresentationContextAccept::m_reserved1;
+    const std::uint8_t PresentationContextAccept::m_reserved2;
+    const std::uint8_t PresentationContextAccept::m_reserved4;
 
-    const BYTE AAssociateAC::m_itemType;
-    const BYTE AAssociateAC::m_reserved1;
-    const UINT16 AAssociateAC::m_protocolVersion;
-    const UINT16 AAssociateAC::m_reserved2;
+    const std::uint8_t AAssociateAC::m_itemType;
+    const std::uint8_t AAssociateAC::m_reserved1;
+    const std::uint16_t AAssociateAC::m_protocolVersion;
+    const std::uint16_t AAssociateAC::m_reserved2;
 #endif
-
-    namespace
-    {
-      /*
-      These globals are only safe if we NEVER EVER actually trust the data on them.
-      (i.e. only use them for reading reserved data from byte stream that we don't
-      check the value on.)
-
-      Using them for anything else may cause thread-related data corruption. 
-      */
-
-      BYTE tmpBYTE;
-
-      UINT16 tmpUINT16;
-      UINT32 tmpUINT32;
-    }
 
     PresentationContextAccept::PresentationContextAccept() :
       m_trnSyntax(UID(""))
     {
     }
 
-    void PresentationContextAccept::write(Network::Socket& socket)
+    void PresentationContextAccept::write(Buffer& temp)
     {
-      socket << m_itemType;
-      socket << m_reserved1;
-      socket << UINT16(size() - 4);
-      socket << m_presentationContextID;
-      socket << m_reserved2;
-      socket << m_result;
-      socket << m_reserved4;
-      m_trnSyntax.write(socket);
+      temp << m_itemType;
+      temp << m_reserved1;
+      temp << std::uint16_t(size() - 4);
+      temp << m_presentationContextID;
+      temp << m_reserved2;
+      temp << m_result;
+      temp << m_reserved4;
+
+      m_trnSyntax.write(temp);
     }
 
-    UINT32 PresentationContextAccept::read(Network::Socket& socket)
+    std::uint32_t PresentationContextAccept::read(Buffer& temp)
     {
-      UINT32 byteread = 0;
-      BYTE b;
-      socket >> b;
+      std::uint32_t byteread = 0;
+
+      std::uint8_t b;
+      temp >> b;
       byteread += sizeof(b);
       EnforceItemType(b, m_itemType);
 
-      byteread += readDynamic(socket);
-      return byteread;
-    }
-
-    /*!
-    See Section 8, table 9-18 for desciption of the following fields.
-
-    */
-    UINT32 PresentationContextAccept::readDynamic(Network::Socket& socket)
-    {
-      UINT32 byteread = 0;
-      socket >> tmpBYTE; //Reserved
-      byteread += sizeof(tmpBYTE);
-      UINT16 length;
-      socket >> length; //number of bytes from here to the end of the TransferSyntax item
+      temp >> b; //Reserved
+      byteread += sizeof(b);
+      std::uint16_t length;
+      temp >> length; //number of bytes from here to the end of the TransferSyntax item
       byteread += sizeof(length);
       //As far as I can see this is redundant apart from as an error check.
-      socket >> m_presentationContextID;
-      socket >> tmpBYTE; //Reserved
-      socket >> m_result; //between 0 and 4
-      socket >> tmpBYTE; //Reserved
-      byteread += sizeof(m_presentationContextID) + sizeof(tmpBYTE) + sizeof(m_result) + sizeof(tmpBYTE);
+      temp >> m_presentationContextID;
+      temp >> b; //Reserved
+      temp >> m_result; //between 0 and 4
+      temp >> b; //Reserved
+      byteread += sizeof(m_presentationContextID) + sizeof(b) + sizeof(m_result) + sizeof(b);
 
-      byteread += m_trnSyntax.read(socket);
-
+      byteread += m_trnSyntax.read(temp);
+      
       Enforce(size() - 4 == length);
+
       return byteread;
     }
 
-    UINT16 PresentationContextAccept::size()
+    std::uint16_t PresentationContextAccept::size()
     {
       return m_trnSyntax.size() + 8;
     }
@@ -119,6 +95,16 @@ namespace dicom
     *
     ************************************************************************/
 
+    void SendByte(std::uint8_t byte, Buffer& dataArray)
+    {
+      dataArray << byte;
+    }
+    
+    void RecvByte(std::uint8_t& byte, Buffer& dataArray)
+    {
+      dataArray >> byte;
+    }
+    
     AAssociateAC::AAssociateAC() :
       m_appContext(UID(""))
     {
@@ -140,127 +126,114 @@ namespace dicom
       m_userInfo = user;
     }
 
-    void AAssociateAC::write(Network::Socket& socket)
+    void AAssociateAC::write(Buffer& temp)
     {
-      socket << m_itemType;
-      socket << m_reserved1;
+      temp << m_itemType;
+      temp << m_reserved1;
 
-      socket << UINT32(size() - 6);
+      temp << std::uint32_t(size() - 6);
 
-      socket << m_protocolVersion;
-      socket << m_reserved2;
+      temp << m_protocolVersion;
+      temp << m_reserved2;
 
-      socket.Sendn<char>(&m_calledAppTitle[0], m_calledAppTitle.size());
-      socket.Sendn(&m_callingAppTitle[0], m_callingAppTitle.size());
+      temp << m_calledAppTitle;
+      temp << m_callingAppTitle;
 
-      socket.Sendn<BYTE>(&m_reserved3[0], m_reserved3.size());
-      m_appContext.write(socket);
+      std::for_each(m_reserved3.begin(), m_reserved3.end(), std::bind(SendByte, std::placeholders::_1, std::ref(temp)));
+      
+      m_appContext.write(temp);
 
       std::vector<PresentationContextAccept>::iterator iter = m_presContextAccepts.begin();
       for (; iter != m_presContextAccepts.end(); ++iter)
       {
-        iter->write(socket);
+        iter->write(temp);
       }
 
-      m_userInfo.write(socket);
+      m_userInfo.write(temp);
     }
 
-    UINT32 AAssociateAC::read(Network::Socket& socket)
+    std::uint32_t AAssociateAC::read(Buffer& temp)
     {
-      UINT32 byteread = 0;
-      BYTE b;
-      socket >> b;
+      std::uint32_t byteread = 0;
+      std::uint8_t b;
+      std::uint16_t bb;
+
+      temp >> b;
       byteread += sizeof(b);
 
       EnforceItemType(b, m_itemType);
-
-      byteread += readDynamic(socket);
-      return byteread;
-    }
-
-    UINT32 AAssociateAC::readDynamic(Network::Socket& socket)
-    {
-      UINT32 byteread = 0;
-      UINT32 tmp_read = 0;
-
-      BYTE TempByte;
-
-      socket >> tmpBYTE; //Reserved1_;
-      byteread += sizeof(tmpBYTE);
-
-      UINT32 length;
-      socket >> length;
-
-      socket >> tmpUINT16;
+      
+      temp >> b; //Reserved1_;
+      byteread += sizeof(b);
+      
+      std::uint32_t length;
+      temp >> length;
+      
+      temp >> bb;
       /*
-      verify that (tmpUINT16 bitand 0x01) is true; - see part 8, table 9-17
-      */
-
-      socket >> tmpUINT16;
-
-      byteread += sizeof(length) + 2 * sizeof(tmpUINT16);
-
+       v *erify that (tmpUINT16 bitand 0x01) is true; - see part 8, table 9-17
+       */
+      
+      temp >> bb;
+      
+      byteread += sizeof(length) + 2 * sizeof(std::uint16_t);
+      
       m_calledAppTitle.assign(16, ' ');
-      socket.Read(m_calledAppTitle);
+      temp >> m_calledAppTitle;
       byteread += 16;
-
+      
       StripTrailingWhitespace(m_calledAppTitle);
-
+      
       m_callingAppTitle.assign(16,' ');
-      socket.Read(m_callingAppTitle);
+      temp >> m_callingAppTitle;
       byteread += 16;
-
+      
       StripTrailingWhitespace(m_callingAppTitle);
 
-      socket.Readn<BYTE>(&m_reserved3[0], 32);
+      std::for_each(m_reserved3.begin(), m_reserved3.end(), std::bind(RecvByte, std::placeholders::_1, std::ref(temp)));
       byteread += 32;
+      
+      int BytesLeftToRead = length - sizeof(std::uint16_t) - sizeof(std::uint16_t) - 64;
 
-      int BytesLeftToRead = length - sizeof(UINT16) - sizeof(UINT16) - 64;
       while(BytesLeftToRead > 0)
       {
-        socket >> TempByte;
-
-        BytesLeftToRead -= sizeof(TempByte);
-        byteread += sizeof(TempByte);
-
-        switch(TempByte)
+        temp >> b;
+        
+        BytesLeftToRead -= sizeof(b);
+        byteread += sizeof(b);
+        
+        switch(b)
         {
           case 0x50: // user information
-            tmp_read = m_userInfo.readDynamic(socket);
+            std::uint32_t tmp_read = m_userInfo.readDynamic(temp);
             byteread += tmp_read;
             BytesLeftToRead -= tmp_read;//UserInfo_.Size();
-          break;
+            break;
           case 0x21:
           {
             PresentationContextAccept PresContextAccept;//should be inside loop.
-            tmp_read = PresContextAccept.readDynamic(socket);
+            std::uint32_t tmp_read = PresContextAccept.readDynamic(temp);
             BytesLeftToRead -= tmp_read;//PresContextAccept.Size();
             byteread += tmp_read;
             m_presContextAccepts.push_back(PresContextAccept);
           }
           break;
           case 0x10:
-            tmp_read = m_appContext.readDynamic(socket);
+            std::uint32_t tmp_read = m_appContext.readDynamic(temp);
             byteread += tmp_read;
             BytesLeftToRead -= tmp_read;//AppContext_.Size();
-          break;
+            break;
           default:
-            throw BadItemType(TempByte, 0);
+            throw BadItemType(b, 0);
         }
       }
-
-      //This line is not enforcible because it may not be true-Sam 28Nov2007
-      //Enforce(length==Size()-6);
-
-      //This if will never happen because of the while loop above. -Sam 28Nov2007
-      //if(BytesLeftToRead)
-      //throw dicom::exception("non-zero remaining bytes in AAssociateAC::ReadDynamic()");
+      
       return byteread;
     }
 
-    UINT32 AAssociateAC::size()
+    std::uint32_t AAssociateAC::size()
     {
-      UINT32 length = sizeof(UINT16) + sizeof(UINT16) + 64;
+      std::uint32_t length = sizeof(std::uint16_t) + sizeof(std::uint16_t) + 64;
       length += m_appContext.size();
 
       std::vector<PresentationContextAccept>::iterator iter = m_presContextAccepts.begin();
@@ -270,7 +243,7 @@ namespace dicom
       }
 
       length += m_userInfo.size();
-      return (length + sizeof(BYTE) + sizeof(BYTE) + sizeof(UINT32));
+      return (length + sizeof(std::uint8_t) + sizeof(std::uint8_t) + sizeof(std::uint32_t));
     }
   }// namespace primitive
 }// namespace dicom
