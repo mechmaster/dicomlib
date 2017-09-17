@@ -5,6 +5,7 @@ set(dicomlib_src_files
   lib/Encoder.cpp
   lib/File.cpp
   lib/Tag.cpp
+  lib/Types.cpp
   lib/UID.cpp
   lib/UIDs.cpp
   lib/ValueToStream.cpp

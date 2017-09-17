@@ -27,7 +27,7 @@ namespace dicom
   {
     struct DictionaryEntry
     {
-      UINT32 tag;
+      std::uint32_t tag;
       VR vr;
       const char* name;
     };
@@ -618,8 +618,6 @@ namespace dicom
       {0x00211108,VR_CS,"FischerPrivateTag00211108"},
       {0x00211109,VR_CS,"FischerPrivateTag00211109"},
       {0x00211110,VR_CS,"FischerPrivateTag00211110"},
-
-
 
       {0x00280000,VR_UL,"GroupLength"},
       {TAG_SAMPLES_PER_PX,VR_US,"SamplesperPixel"},
@@ -1473,11 +1471,7 @@ namespace dicom
       //{TAG_PIXEL_DATA,VR_OB,"PixelDataOW"},
       {TAG_PIXEL_DATA,VR_OW,"PixelData"},
 
-
       {TAG_DATA_SET_PADDING,VR_OB,"DataSetTrailingPadding"},
-
-
-
 
       {0x50000000,VR_UL,"GroupLength"},
       {0x50000005,VR_US,"CurveDimensions"},
@@ -1508,7 +1502,6 @@ namespace dicom
       //changed by morgan@sten.sunnybrook.utoronto.ca
       //{0x50003000,VR_OB,"CurveDataOW"}
       {0x50003000,VR_OW,"CurveDataOW"},
-
 
       {0x60000000,VR_UL,"GroupLength"},
       {0x60000010,VR_US,"OverlayRows"},
@@ -1621,7 +1614,7 @@ namespace dicom
     Enforce(TheDataDictionary.end() == TheDataDictionary.find(tag), "Item already exists");
 
     //Enforce that tag is in private range
-    UINT16 group = GroupTag(tag);
+    std::uint16_t group = GroupTag(tag);
     Enforce(group & 0x01, "Group element must be odd.");
     TheDataDictionary[tag] = Item(vr, name);
   }

@@ -1,21 +1,21 @@
 /************************************************************************
-*	DICOMLIB
-*	Copyright 2003 Sunnybrook and Women's College Health Science Center
-*	Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
+* DICOMLIB
+* Copyright 2003 Sunnybrook and Women's College Health Science Center
+* Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
 *
-*	See LICENSE.txt for copyright and licensing info.
+* See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
 #include "Cdimse.hpp"
 
 /*
-	This file needs a lot of cleaning up work.
+This file needs a lot of cleaning up work.
 */
 /*
-	I'm a bit worried that the 'Group Length' field
-	never seems to get inserted, as the standard seems
-	to require for all messages.  Am I missing something
-	here?
+I'm a bit worried that the 'Group Length' field
+never seems to get inserted, as the standard seems
+to require for all messages.  Am I missing something
+here?
 */
 
 namespace dicom
@@ -27,7 +27,7 @@ See Part 8, table 9.1-5
 
   void HandleCEcho(ServiceBase& pdu, const DataSet& command, const UID& classUID)
   {
-    UINT16 msgID;
+    std::uint16_t msgID;
     command(TAG_MSG_ID ) >> msgID;
 
     CommandSet::CEchoRSP response(msgID, classUID);
@@ -37,8 +37,8 @@ See Part 8, table 9.1-5
 
   void HandleCStore(CStoreFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID)
   {
-    UINT16 msgID;
-    UINT16 data_set_status;
+    std::uint16_t msgID;
+    std::uint16_t data_set_status;
 
     command(TAG_MSG_ID) >> msgID;
     command(TAG_DATA_SET_TYPE) >> data_set_status;
@@ -73,8 +73,8 @@ See Part 8, table 9.1-5
     std::cout  << "HandleCFind:" << std::endl << command;
 #endif
 
-    UINT16 msgID;
-    UINT16 data_set_status;
+    std::uint16_t msgID;
+    std::uint16_t data_set_status;
 
     command(TAG_MSG_ID) >> msgID;
     command(TAG_DATA_SET_TYPE) >> data_set_status;
@@ -120,7 +120,7 @@ See Part 8, table 9.1-5
 
   void HandleCMove(CMoveFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID)
   {
-    UINT16 data_set_status;
+    std::uint16_t data_set_status;
 
     command(TAG_DATA_SET_TYPE) >> data_set_status;
 
@@ -144,17 +144,17 @@ See Part 8, table 9.1-5
 
   void CEchoSCU::writeRQ()
   {
-    CommandSet::CEchoRQ rq(uniq16odd(), m_classUID);
+    CommandSet::CEchoRQ rq(getMessageID(), m_classUID);
     m_service.WriteCommand(rq, m_classUID);
   }
 
-  void CEchoSCU::readRSP(UINT16& status)
+  void CEchoSCU::readRSP(std::uint16_t& status)
   {
     DataSet response;
     readRSP(status, response);
   }
 
-  void CEchoSCU::readRSP(UINT16& status, DataSet& response)
+  void CEchoSCU::readRSP(std::uint16_t& status, DataSet& response)
   {
     m_service.Read(response);
     response(TAG_STATUS) >> status;
@@ -165,20 +165,20 @@ See Part 8, table 9.1-5
   {
   }
 
-  void CStoreSCU::writeRQ(const UID& instUID, const DataSet& data, UINT16 priority)
+  void CStoreSCU::writeRQ(const UID& instUID, const DataSet& data, std::uint16_t priority)
   {
-    CommandSet::CStoreRQ rq(uniq16odd(), m_classUID, instUID, priority);
+    CommandSet::CStoreRQ rq(getMessageID(), m_classUID, instUID, priority);
     m_service.WriteCommand(rq, m_classUID);
     m_service.WriteDataSet(data, m_classUID);
   }
 
-  void CStoreSCU::readRSP(UINT16& status)//maybe status should be a return value?TODO
+  void CStoreSCU::readRSP(std::uint16_t& status) //maybe status should be a return value?TODO
   {
     DataSet response;
     readRSP(status, response);
   }
 
-  void CStoreSCU::readRSP(UINT16& status, DataSet& response)
+  void CStoreSCU::readRSP(std::uint16_t& status, DataSet& response)
   {
     m_service.Read(response);
     response(TAG_STATUS) >> status;
@@ -193,14 +193,14 @@ See Part 8, table 9.1-5
   {
   }
 
-  void CFindSCU::writeRQ(const DataSet& data, UINT16 priority)
+  void CFindSCU::writeRQ(const DataSet& data, std::uint16_t priority)
   {
-    CommandSet::CFindRQ rq(uniq16odd(), m_classUID, priority);
+    CommandSet::CFindRQ rq(getMessageID(), m_classUID, priority);
     m_service.WriteCommand(rq, m_classUID);
     m_service.WriteDataSet(data, m_classUID);
   }
 
-  void CFindSCU::readRSP(UINT16& status, DataSet& data)
+  void CFindSCU::readRSP(std::uint16_t& status, DataSet& data)
   {
     DataSet response;
     readRSP(status, response, data);
@@ -210,9 +210,9 @@ See Part 8, table 9.1-5
   //All the ::readRSP functions from here on are identical: please
   //amalgamate!
 
-  void CFindSCU::readRSP(UINT16& status, DataSet& response, DataSet& data)
+  void CFindSCU::readRSP(std::uint16_t& status, DataSet& response, DataSet& data)
   {
-    UINT16 dstype = 0;
+    std::uint16_t dstype = 0;
 
     m_service.Read(response);
 
@@ -230,22 +230,22 @@ See Part 8, table 9.1-5
   {
   }
 
-  void CGetSCU::writeRQ(const DataSet& data, UINT16 priority)
+  void CGetSCU::writeRQ(const DataSet& data, std::uint16_t priority)
   {
-    CommandSet::CGetRQ rq(uniq16odd(), m_classUID, priority);
+    CommandSet::CGetRQ rq(getMessageID(), m_classUID, priority);
     m_service.WriteCommand(rq, m_classUID);
     m_service.WriteDataSet(data, m_classUID);
   }
 
-  void CGetSCU::readRSP(UINT16& status, DataSet&  data)
+  void CGetSCU::readRSP(std::uint16_t& status, DataSet&  data)
   {
     DataSet rsp;
     readRSP(status, rsp, data);
   }
 
-  void CGetSCU::readRSP(UINT16& status, DataSet& response, DataSet&  data)
+  void CGetSCU::readRSP(std::uint16_t& status, DataSet& response, DataSet&  data)
   {
-    UINT16 dstype = 0;
+    std::uint16_t dstype = 0;
 
     m_service.Read(response);
 
@@ -263,9 +263,9 @@ See Part 8, table 9.1-5
   {
   }
 
-  void CMoveSCU::writeRQ(const std::string& destAET, const DataSet& data, UINT16 priority)
+  void CMoveSCU::writeRQ(const std::string& destAET, const DataSet& data, std::uint16_t priority)
   {
-    CommandSet::CMoveRQ rq(uniq16odd(), m_classUID, destAET, priority);
+    CommandSet::CMoveRQ rq(getMessageID(), m_classUID, destAET, priority);
     m_service.WriteCommand(rq, m_classUID);
     m_service.WriteDataSet(data, m_classUID);
   }
@@ -275,15 +275,15 @@ See Part 8, table 9.1-5
   is superfluous
   */
 
-  void CMoveSCU::readRSP(UINT16& status, DataSet& data)
+  void CMoveSCU::readRSP(std::uint16_t& status, DataSet& data)
   {
     DataSet response;
     readRSP(status, response, data);
   }
 
-  void CMoveSCU::readRSP(UINT16& status, DataSet& response, DataSet&  data)
+  void CMoveSCU::readRSP(std::uint16_t& status, DataSet& response, DataSet&  data)
   {
-    UINT16 dstype = 0;
+    std::uint16_t dstype = 0;
 
     m_service.Read(response);
 

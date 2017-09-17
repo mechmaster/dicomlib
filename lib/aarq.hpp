@@ -1,40 +1,40 @@
 /************************************************************************
-*	DICOMLIB
-*	Copyright 2003 Sunnybrook and Women's College Health Science Center
-*	Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
+* DICOMLIB
+* Copyright 2003 Sunnybrook and Women's College Health Science Center
+* Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
 *
-*	See LICENSE.txt for copyright and licensing info.
+* See LICENSE.txt for copyright and licensing info.
 *************************************************************************/
 
 #pragma once
 
 /*
-	I'd like to pull most of these classes out into individual files,
-	so I can actually find the damn things when I want them.
+I'd like to pull most of these classes out into individual files,
+so I can actually find the damn things when I want them.
 
-	Either that or put them all in DicomMessages.hpp?
+Either that or put them all in DicomMessages.hpp?
 */
 
 /*
-	This file should be renamed something
-	more obvious, like AssociationRequest.
+This file should be renamed something
+more obvious, like AssociationRequest.
 
-	Some of the other stuff in this file may not
-	belong here.
+Some of the other stuff in this file may not
+belong here.
 */
 
 /*
-	I don't seem to have been consistent with my naming conventions
-	-sometimes I use a trailing underscore to denote membership, but
-	not always.
+I don't seem to have been consistent with my naming conventions
+-sometimes I use a trailing underscore to denote membership, but
+not always.
 */
 
 /*
-	I'm not happy that message primitive classes have default constructors.
-	The procedure for reading messages is often:
-	Create object with default constructor, then call member function ReadDynamic
-	with a socket object as an argument.
-	Why not just have constructors that take socket objects as arguments?
+I'm not happy that message primitive classes have default constructors.
+The procedure for reading messages is often:
+Create object with default constructor, then call member function ReadDynamic
+with a socket object as an argument.
+Why not just have constructors that take socket objects as arguments?
 
 */
 
@@ -44,10 +44,11 @@
 
 #include "UID.hpp"
 #include "Types.hpp"
+#include "Buffer.hpp"
 
 /*
 * PDU Service Classes:
-*	A-ASSOCIATE-RQ Class.
+* A-ASSOCIATE-RQ Class.
 */
 
 namespace dicom
@@ -56,11 +57,11 @@ namespace dicom
   struct BadItemType : public dicom::exception
   {
     //!What was provided.
-    BYTE m_item;
+    std::uint8_t m_item;
     //!What should have been provided, or 0 if unknown.
-    BYTE m_expected;
+    std::uint8_t m_expected;
 
-    BadItemType(BYTE Item, BYTE Expected) :
+    BadItemType(std::uint8_t Item, std::uint8_t Expected) :
       dicom::exception("Bad Item Type"),
       m_item(Item),
       m_expected(Expected)
@@ -69,7 +70,7 @@ namespace dicom
   };
 
   //!Throws BadItemType if Given is not equal to Expected
-  void EnforceItemType(BYTE Given, BYTE Expected);
+  void EnforceItemType(std::uint8_t Given, std::uint8_t Expected);
 
   namespace primitive
   {
@@ -78,16 +79,16 @@ namespace dicom
     */
     struct ApplicationContext
     {
-      static const BYTE m_itemType = 0x10;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x10;
+      static const std::uint8_t m_reserved = 0x00;
 
       UID m_UID;
 
       ApplicationContext(const UID&);
 
-      UINT32 readDynamic(Network::Socket& socket);
-      void write(Network::Socket& socket) const;
-      UINT32 size() const;
+      std::uint32_t read(Buffer& temp);
+      void write(Buffer& temp);
+      std::uint32_t size();
     };
 
     /*!
@@ -95,42 +96,39 @@ namespace dicom
     */
     struct AbstractSyntax
     {
-      static const BYTE m_itemType = 0x30;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x30;
+      static const std::uint8_t m_reserved = 0x00;
 
       UID m_UID;
 
       AbstractSyntax(const UID &);
 
-      void set(const UID&);
-      void write(Network::Socket&);
-      UINT32 read(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT32 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
 
     /*
-    *	What is the functional overlap between this class and the one named "TS"??
-    *	This is the 'message' that gets exchanged along the wire.  'TS' is our internal
-    *	representation of the Transfer Syntax concept.
+    * What is the functional overlap between this class and the one named "TS"??
+    * This is the 'message' that gets exchanged along the wire.  'TS' is our internal
+    * representation of the Transfer Syntax concept.
     */
     /*!
     Defined in Part 8, table 9-15
     */
     struct TransferSyntax
     {
-      static const BYTE m_itemType = 0x40;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x40;
+      static const std::uint8_t m_reserved = 0x00;
 
       UID m_UID;
 
       TransferSyntax(const UID&);
 
       void set(const UID&);
-      void write(Network::Socket&);
-      UINT32 read(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT32 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
 
     //!Identifies an implementation by unique identifier
@@ -139,15 +137,15 @@ namespace dicom
     */
     struct ImplementationClass
     {
-      static const BYTE m_itemType = 0x52;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x52;
+      static const std::uint8_t m_reserved = 0x00;
 
       UID m_UID;
 
       ImplementationClass(const UID&);
-      UINT32 readDynamic(Network::Socket& socket);
-      void write(Network::Socket& socket);
-      UINT32 size();
+      std::uint32_t read(Buffer& temp);
+      void write(Buffer& temp);
+      std::uint32_t size();
     };
 
     //!Identifies a particuler imlementation by name
@@ -157,14 +155,14 @@ namespace dicom
     */
     struct ImplementationVersion
     {
-      static const BYTE m_itemType = 0x55;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x55;
+      static const std::uint8_t m_reserved = 0x00;
 
       std::string m_name;//May be 1 to 16 characters long.
 
-      UINT32 readDynamic(Network::Socket& socket);
-      void write(Network::Socket& socket);
-      UINT32 size();
+      std::uint32_t read(Buffer& temp);
+      void write(Buffer& temp);
+      std::uint32_t size();
     };
 
     /*!
@@ -172,20 +170,20 @@ namespace dicom
     */
     struct SCPSCURoleSelect
     {
-      static const BYTE m_itemType = 0x54;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x54;
+      static const std::uint8_t m_reserved = 0x00;
 
-      UINT16 m_itemLength;//length to end of object - probably shouldn't be a member
+      std::uint16_t m_itemLength;//length to end of object - probably shouldn't be a member
       UID m_UID;
 
-      BYTE m_SCURole;
-      BYTE m_SCPRole;
+      std::uint8_t m_SCURole;
+      std::uint8_t m_SCPRole;
 
       SCPSCURoleSelect();//is this a good idea?
 
-      void write(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT32 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
 
     /*!
@@ -200,26 +198,26 @@ namespace dicom
       to ignore the requirement.
       */
 
-      static const BYTE m_itemType = 0x20;
-      static const BYTE m_reserved1 = 0x00;
-      static const BYTE m_reserved2 = 0x00;
-      static const BYTE m_reserved3 = 0x00;
-      static const BYTE m_reserved4 = 0x00;
+      static const std::uint8_t m_itemType = 0x20;
+      static const std::uint8_t m_reserved1 = 0x00;
+      static const std::uint8_t m_reserved2 = 0x00;
+      static const std::uint8_t m_reserved3 = 0x00;
+      static const std::uint8_t m_reserved4 = 0x00;
 
-      UINT16 m_length;
+      std::uint16_t m_length;
       std::vector<TransferSyntax> m_transferSyntaxes;
 
-      BYTE m_ID;
+      std::uint8_t m_ID;
       AbstractSyntax m_AbsSyntax;
 
       PresentationContext();
-      PresentationContext(const AbstractSyntax&, const std::vector<TransferSyntax>&, BYTE id);
-      PresentationContext(const AbstractSyntax&, BYTE id);
+      PresentationContext(const AbstractSyntax&, const std::vector<TransferSyntax>&, std::uint8_t id);
+      PresentationContext(const AbstractSyntax&, std::uint8_t id);
 
       void addTransferSyntax(TransferSyntax&);
-      void write(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT32 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
 
     /*!
@@ -227,19 +225,17 @@ namespace dicom
     */
     struct MaximumSubLength
     {
-      static const BYTE m_itemType = 0x51;
-      static const BYTE m_reserved1 = 0x00;
-      static const UINT16 m_length = 0x04;
-      UINT32 m_maximumLength;
+      static const std::uint8_t m_itemType = 0x51;
+      static const std::uint8_t m_reserved1 = 0x00;
+      static const std::uint16_t m_length = 0x04;
+      std::uint32_t m_maximumLength;
 
       MaximumSubLength();
-      MaximumSubLength(UINT32);
+      MaximumSubLength(std::uint32_t);
 
-      void set(UINT32);
-      UINT32 get();
-      void write(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT32 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
 
     /*!
@@ -247,10 +243,10 @@ namespace dicom
     */
     struct UserInformation
     {
-      static const BYTE m_itemType = 0x50;
-      static const BYTE m_reserved = 0x00;
+      static const std::uint8_t m_itemType = 0x50;
+      static const std::uint8_t m_reserved = 0x00;
 
-      UINT32 m_userInfoBaggage;
+      std::uint32_t m_userInfoBaggage;
       MaximumSubLength m_maxSubLength;
       ImplementationClass m_impClass;
       ImplementationVersion m_impVersion;//this is an optional field. 
@@ -260,11 +256,9 @@ namespace dicom
 
       UserInformation();
 
-      void setMax(MaximumSubLength&);
-
-      void write(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT16 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
 
     //!A request to open a dicom association
@@ -273,29 +267,28 @@ namespace dicom
     */
     struct AAssociateRQ
     {
-      static const BYTE m_itemType = 0x01;
-      static const BYTE m_reserved1 = 0x00;
-      static const UINT16 m_protocolVersion = 0x01;
-      static const UINT16 m_reserved2 = 0x00;
+      static const std::uint8_t m_itemType = 0x01;
+      static const std::uint8_t m_reserved1 = 0x00;
+      static const std::uint16_t m_protocolVersion = 0x01;
+      static const std::uint16_t m_reserved2 = 0x00;
 
       std::string m_calledAppTitle;
       std::string m_callingAppTitle;
-      std::array<BYTE, 32> m_reserved3;
+      std::array<std::uint8_t, 32> m_reserved3;
 
-      const ApplicationContext m_appContext;
+      ApplicationContext m_appContext;
 
       //! I think this should be called "ProposedPresentationContexts"
-      std::vector<PresentationContext> m_proposedPresentationContexts;//PresContexts;
+      std::vector<PresentationContext> m_proposedPresentationContexts; //PresContexts;
       UserInformation m_userInfo;
 
       AAssociateRQ();
       AAssociateRQ(const std::string& CallingAp, const std::string& CalledAp);
 
       void setUserInformation(UserInformation&);
-      void write(Network::Socket&);
-      UINT32 read(Network::Socket&);
-      UINT32 readDynamic(Network::Socket&);
-      UINT32 size();
+      void write(Buffer& temp);
+      std::uint32_t read(Buffer& temp);
+      std::uint32_t size();
     };
   }//namespace primitive
 }//namespace dicom

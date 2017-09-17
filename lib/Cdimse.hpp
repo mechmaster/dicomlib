@@ -22,19 +22,19 @@ namespace dicom
 {
 
 /*
-	First we define the signature of callback functions that will be called
-	by instances of ThreadSpecificServer on receiving CDIMSE commands, such as
-	C-MOVE, C-FIND etc...
+First we define the signature of callback functions that will be called
+by instances of ThreadSpecificServer on receiving CDIMSE commands, such as
+C-MOVE, C-FIND etc...
 
-	A developer of a DICOM server must implement functions that match these
-	signatures and register them with a Server object by calling Server::AddHandler(...)
+A developer of a DICOM server must implement functions that match these
+signatures and register them with a Server object by calling Server::AddHandler(...)
 
-	See comments in Server.hpp
+See comments in Server.hpp
 
-	We use boost::function to specify function signatures.  Note that due to limitations
-	in Microsoft Visual C++ 7.0, we need to provide two alternative syntaxes.
+We use boost::function to specify function signatures.  Note that due to limitations
+in Microsoft Visual C++ 7.0, we need to provide two alternative syntaxes.
 
-	We should probably create a Callbacks.hpp file for these typedefs.
+We should probably create a Callbacks.hpp file for these typedefs.
 */
 
 #if defined(_MSC_VER) //MSVC v7.1 and above may not need this workaround.
@@ -114,8 +114,8 @@ namespace dicom
     CEchoSCU(ServiceBase& service);//,const UID& classUID = VERIFICATION_SOP_CLASS);
 
     void writeRQ();
-    void readRSP(UINT16& stat_p);
-    void readRSP(UINT16& status, DataSet& response);
+    void readRSP(std::uint16_t& stat_p);
+    void readRSP(std::uint16_t& status, DataSet& response);
   };
 
   class CStoreSCU : public SCU
@@ -125,9 +125,9 @@ namespace dicom
 
     CStoreSCU(ServiceBase& service, const UID& classUID);
 
-    void writeRQ(const UID& instUID, const DataSet& data, UINT16 priority = Priority::MEDIUM);
-    void readRSP(UINT16& status);
-    void readRSP(UINT16& status, DataSet& response);
+    void writeRQ(const UID& instUID, const DataSet& data, std::uint16_t priority = Priority::MEDIUM);
+    void readRSP(std::uint16_t& status);
+    void readRSP(std::uint16_t& status, DataSet& response);
   };
 
   class CFindSCU : public SCU
@@ -137,9 +137,9 @@ namespace dicom
 
     CFindSCU(ServiceBase& service, const UID& classUID);
 
-    void writeRQ(const DataSet& data, UINT16 priority = Priority::MEDIUM);
-    void readRSP(UINT16& status, DataSet& data);
-    void readRSP(UINT16& status, DataSet& response, DataSet& data);
+    void writeRQ(const DataSet& data, std::uint16_t priority = Priority::MEDIUM);
+    void readRSP(std::uint16_t& status, DataSet& data);
+    void readRSP(std::uint16_t& status, DataSet& response, DataSet& data);
   };
 
   class CGetSCU : public SCU
@@ -149,9 +149,9 @@ namespace dicom
 
     CGetSCU(ServiceBase& service, const UID& classUID);
 
-    void writeRQ(const DataSet& data, UINT16 priority = Priority::MEDIUM);
-    void readRSP(UINT16& status, DataSet& data);
-    void readRSP(UINT16& status, DataSet& response, DataSet& data);
+    void writeRQ(const DataSet& data, std::uint16_t priority = Priority::MEDIUM);
+    void readRSP(std::uint16_t& status, DataSet& data);
+    void readRSP(std::uint16_t& status, DataSet& response, DataSet& data);
   };
 
   class CMoveSCU : public SCU
@@ -161,9 +161,9 @@ namespace dicom
 
     CMoveSCU(ServiceBase& service, const UID& classUID);
 
-    void writeRQ(const std::string& destAET, const DataSet& data, UINT16 priority = Priority::MEDIUM);
-    void readRSP(UINT16& status, DataSet& data);
-    void readRSP(UINT16& status, DataSet& response, DataSet& data);
+    void writeRQ(const std::string& destAET, const DataSet& data, std::uint16_t priority = Priority::MEDIUM);
+    void readRSP(std::uint16_t& status, DataSet& data);
+    void readRSP(std::uint16_t& status, DataSet& response, DataSet& data);
   };
 }//namespace dicom
 

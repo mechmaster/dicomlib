@@ -6,7 +6,7 @@ namespace dicom
   exception class.
   */
 
-  AssociationRejection::AssociationRejection(BYTE Result, BYTE Source, BYTE Reason) :
+  AssociationRejection::AssociationRejection(std::uint8_t Result, std::uint8_t Source, std::uint8_t Reason) :
     dicom::exception("Association Rejection"),
     m_result(Result),
     m_source(Source),

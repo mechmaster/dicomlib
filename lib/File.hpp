@@ -38,7 +38,7 @@ namespace dicom
   */
 
   //!Thrown if we can't open the file, it's corrupt.
-  class FileException:public dicom::exception
+  class FileException : public dicom::exception
   {
 
   public:

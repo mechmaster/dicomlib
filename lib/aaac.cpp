@@ -94,16 +94,6 @@ namespace dicom
     * AAssociateAC Packet
     *
     ************************************************************************/
-
-    void SendByte(std::uint8_t byte, Buffer& dataArray)
-    {
-      dataArray << byte;
-    }
-    
-    void RecvByte(std::uint8_t& byte, Buffer& dataArray)
-    {
-      dataArray >> byte;
-    }
     
     AAssociateAC::AAssociateAC() :
       m_appContext(UID(""))

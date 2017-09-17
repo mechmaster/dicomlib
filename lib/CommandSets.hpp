@@ -7,6 +7,7 @@
 *************************************************************************/
 #pragma once
 
+#include "Types.hpp"
 #include "DataSet.hpp"
 
 namespace dicom
@@ -30,7 +31,7 @@ namespace dicom
 
     public:
 
-      CEchoRQ(UINT16 msgID, const UID& classUID);
+      CEchoRQ(std::uint16_t msgID, const UID& classUID);
     };
 
     class CEchoRSP : public DataSet
@@ -38,7 +39,7 @@ namespace dicom
 
     public:
 
-      CEchoRSP(UINT16 msgID, const UID& classUID);
+      CEchoRSP(std::uint16_t msgID, const UID& classUID);
     };
 
     //!Request a C-STORE operation
@@ -50,9 +51,9 @@ namespace dicom
 
     public:
 
-      CStoreRQ(UINT16 msgID, const UID& classUID, const UID& instUID, UINT16 priority = Priority::MEDIUM);
-      CStoreRQ(UINT16 msgID, const UID& classUID, const UID& instUID, const std::string& moveAET, UINT16 moveMsgID,
-        UINT16 priority = Priority::MEDIUM);
+      CStoreRQ(std::uint16_t msgID, const UID& classUID, const UID& instUID, std::uint16_t priority = Priority::MEDIUM);
+      CStoreRQ(std::uint16_t msgID, const UID& classUID, const UID& instUID, const std::string& moveAET, std::uint16_t moveMsgID,
+        std::uint16_t priority = Priority::MEDIUM);
     };
 
     //!Respond to a C-STORE Request
@@ -64,7 +65,7 @@ namespace dicom
 
     public:
 
-      CStoreRSP(UINT16 msgID, const UID& classUID, const UID& instUID, UINT16 stat);
+      CStoreRSP(std::uint16_t msgID, const UID& classUID, const UID& instUID, std::uint16_t stat);
     };
 
     //!C-FIND request.
@@ -76,7 +77,7 @@ namespace dicom
 
     public:
 
-      CFindRQ(UINT16 msgID, const UID& classUID, UINT16 priority = Priority::MEDIUM);
+      CFindRQ(std::uint16_t msgID, const UID& classUID, std::uint16_t priority = Priority::MEDIUM);
     };
 
     //!C-FIND Response
@@ -89,7 +90,7 @@ namespace dicom
 
     public:
 
-      CFindRSP(UINT16 msgID, const UID& classUID, UINT16 stat, UINT16 dsType);
+      CFindRSP(std::uint16_t msgID, const UID& classUID, std::uint16_t stat, std::uint16_t dsType);
     };
 
     class CCancelRQ : public DataSet
@@ -97,7 +98,7 @@ namespace dicom
 
     public:
 
-      CCancelRQ(UINT16 msgID);
+      CCancelRQ(std::uint16_t msgID);
     };
 
     class CGetRQ : public DataSet
@@ -105,7 +106,7 @@ namespace dicom
 
     public:
 
-      CGetRQ(UINT16 msgID, const UID& classUID, UINT16 priority = Priority::MEDIUM);
+      CGetRQ(std::uint16_t msgID, const UID& classUID, std::uint16_t priority = Priority::MEDIUM);
     };
 
     class CGetRSP : public DataSet
@@ -113,11 +114,11 @@ namespace dicom
 
     public:
 
-      CGetRSP(UINT16 msgID, const UID& classUID, UINT16 stat, UINT16 dsType);
-      void setRemaining(UINT16 n);
-      void setCompleted(UINT16 n);
-      void setFailed(UINT16 n);
-      void setWarning(UINT16 n);
+      CGetRSP(std::uint16_t msgID, const UID& classUID, std::uint16_t stat, std::uint16_t dsType);
+      void setRemaining(std::uint16_t n);
+      void setCompleted(std::uint16_t n);
+      void setFailed(std::uint16_t n);
+      void setWarning(std::uint16_t n);
     };
 
     class CMoveRQ : public DataSet
@@ -125,7 +126,7 @@ namespace dicom
 
     public:
 
-      CMoveRQ(UINT16 msgID, const UID& classUID, const std::string& destAET, UINT16 priority = Priority::MEDIUM);
+      CMoveRQ(std::uint16_t msgID, const UID& classUID, const std::string& destAET, std::uint16_t priority = Priority::MEDIUM);
     };
 
     class CMoveRSP : public DataSet
@@ -133,11 +134,11 @@ namespace dicom
 
     public:
 
-      CMoveRSP(UINT16 msgID, const UID& classUID, UINT16 stat, UINT16 dsType);
-      void setRemaining(UINT16 n);
-      void setCompleted(UINT16 n);
-      void setFailed(UINT16 n);
-      void setWarning(UINT16 n);
+      CMoveRSP(std::uint16_t msgID, const UID& classUID, std::uint16_t stat, std::uint16_t dsType);
+      void setRemaining(std::uint16_t n);
+      void setCompleted(std::uint16_t n);
+      void setFailed(std::uint16_t n);
+      void setWarning(std::uint16_t n);
     };
 
     //////////////////////////////////////////////////////////////////////////
@@ -149,7 +150,8 @@ namespace dicom
 
     public:
 
-      NEventReportRQ(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID, UINT16 eventTypID, UINT16 dsType);
+      NEventReportRQ(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID,
+        std::uint16_t eventTypID, std::uint16_t dsType);
     };
 
     class NEventReportRSP : public dicom::DataSet
@@ -157,7 +159,8 @@ namespace dicom
 
     public:
 
-      NEventReportRSP(UINT16 msgID, const dicom::UID& classUID, UINT16 stat, UINT16 eventTypID, UINT16 dsType);
+      NEventReportRSP(std::uint16_t msgID, const dicom::UID& classUID, std::uint16_t stat,
+        std::uint16_t eventTypID, std::uint16_t dsType);
     };
 
     class NGetRQ : public dicom::DataSet
@@ -165,7 +168,7 @@ namespace dicom
 
     public:
 
-      NGetRQ(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID, const std::vector<Tag>& attrList);
+      NGetRQ(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID, const std::vector<Tag>& attrList);
     };
 
     class NGetRSP : public dicom::DataSet
@@ -173,7 +176,7 @@ namespace dicom
 
     public:
 
-      NGetRSP(UINT16 msgID, const dicom::UID& classUID, UINT16 stat, UINT16 dsType);
+      NGetRSP(std::uint16_t msgID, const dicom::UID& classUID, std::uint16_t stat, std::uint16_t dsType);
     };
 
     class NSetRQ : public dicom::DataSet
@@ -181,7 +184,7 @@ namespace dicom
 
     public:
 
-      NSetRQ(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID);
+      NSetRQ(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID);
     };
 
     class NSetRSP : public dicom::DataSet
@@ -189,7 +192,7 @@ namespace dicom
 
     public:
 
-      NSetRSP(UINT16 msgID, const dicom::UID& classUID, UINT16 stat, UINT16 dsType);
+      NSetRSP(std::uint16_t msgID, const dicom::UID& classUID, std::uint16_t stat, std::uint16_t dsType);
     };
 
     class NActionRQ : public dicom::DataSet
@@ -197,7 +200,8 @@ namespace dicom
 
     public:
 
-      NActionRQ(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID, UINT16 actionTypID, UINT16 dsType);
+      NActionRQ(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID,
+        std::uint16_t actionTypID, std::uint16_t dsType);
     };
 
     class NActionRSP : public dicom::DataSet
@@ -205,7 +209,8 @@ namespace dicom
 
     public:
 
-      NActionRSP(UINT16 msgID, const dicom::UID& classUID, UINT16 stat, UINT16 actionTypID, UINT16 dsType);
+      NActionRSP(std::uint16_t msgID, const dicom::UID& classUID, std::uint16_t stat,
+        std::uint16_t actionTypID, std::uint16_t dsType);
     };
 
     class NCreateRQ : public dicom::DataSet
@@ -213,8 +218,8 @@ namespace dicom
 
     public:
 
-      NCreateRQ(UINT16 msgID, const dicom::UID& classUID, UINT16 dsType);
-      NCreateRQ(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID, UINT16 dsType);
+      NCreateRQ(std::uint16_t msgID, const dicom::UID& classUID, std::uint16_t dsType);
+      NCreateRQ(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID, std::uint16_t dsType);
     };
 
     class NCreateRSP : public dicom::DataSet
@@ -222,7 +227,8 @@ namespace dicom
 
     public:
 
-      NCreateRSP(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID, UINT16 stat, UINT16 dsType);
+      NCreateRSP(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID,
+        std::uint16_t stat, std::uint16_t dsType);
     };
 
     class NDeleteRQ : public dicom::DataSet
@@ -230,7 +236,7 @@ namespace dicom
 
     public:
 
-      NDeleteRQ(UINT16 msgID, const dicom::UID& classUID, const dicom::UID& instUID);
+      NDeleteRQ(std::uint16_t msgID, const dicom::UID& classUID, const dicom::UID& instUID);
     };
 
     class NDeleteRSP : public dicom::DataSet  
@@ -238,7 +244,7 @@ namespace dicom
 
     public:
 
-      NDeleteRSP(UINT16 msgID, const dicom::UID& classUID, UINT16 stat);
+      NDeleteRSP(std::uint16_t msgID, const dicom::UID& classUID, std::uint16_t stat);
     };
   }//namespace CommandSet
 }//namespace dicom

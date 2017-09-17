@@ -28,7 +28,7 @@ void StripTrailingWhitespace(std::string& str)
 void StripTrailingNull(std::string& str)
 {
   str.erase(remove_if(str.begin(), str.end(),
-    [](std::uint8_t& ch) -> bool
+    [](std::uint8_t ch) -> bool
     {
       return ch == '\0';
     }
