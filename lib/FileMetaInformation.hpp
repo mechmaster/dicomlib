@@ -47,5 +47,7 @@ namespace dicom
     FileMetaInformation(const DataSet& data, TS ts);
 
     std::uint32_t write(std::ostream& Out);
+    
+    DataSet getMetaElements();
   };
 }//namespace dicom

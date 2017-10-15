@@ -45,8 +45,8 @@ namespace dicom
     try
     {
       FileMetaInformation MetaInfo(In);
-      ds = MetaInfo.MetaElements_;
-      
+      ds = MetaInfo.getMetaElements();
+
       return true;
     }
     catch (FileMetaInfoException& e)
@@ -77,7 +77,7 @@ namespace dicom
     try
     {
       FileMetaInformation MetaInfo(In);
-      MetaInfo.MetaElements_(TAG_TRANSFER_SYNTAX_UID) >> TransferSyntaxUID;
+      MetaInfo.getMetaElements()(TAG_TRANSFER_SYNTAX_UID) >> TransferSyntaxUID;
     }
     catch (FileMetaInfoException& e)
     {
@@ -90,8 +90,8 @@ namespace dicom
       myself to, but if you really need it, remove the following
       re-throw command
       */
-      throw;
       In.seekg(0, std::ios::beg);
+      throw;
     }
 
     TS ts(TransferSyntaxUID);
@@ -126,13 +126,13 @@ namespace dicom
   void WriteToStream(const DataSet& data, std::ostream& Out, TS ts, bool Tiff)
   {
     FileMetaInformation MetaInfo(data, ts);
-    int bytes_in_meta = MetaInfo.Write(Out); //We write it now to get the buffer size of MeatInfo 
+    int bytes_in_meta = MetaInfo.write(Out); //We write it now to get the buffer size of MeatInfo 
                                                 //rewrite when we get enough infomation to put to TIFF header
 
     int ByteOrder = ts.isBigEndian()? __BIG_ENDIAN : __LITTLE_ENDIAN;
 
     Buffer buffer(ByteOrder);
-    UID TS_UID = MetaInfo.MetaElements_(TAG_TRANSFER_SYNTAX_UID).Get<UID>();
+    UID TS_UID = MetaInfo.getMetaElements()(TAG_TRANSFER_SYNTAX_UID).Get<UID>();
 
     WriteToBuffer(data, buffer, TS(TS_UID));
 
@@ -148,8 +148,8 @@ namespace dicom
 
     if (Tiff)
     {
-      FileMetaInformation MetaInfoTiff(data, ts, bytes_to_write + bytes_in_meta);
-      MetaInfoTiff.Write(Out);
+      FileMetaInformation MetaInfoTiff(data, ts);
+      MetaInfoTiff.write(Out);
     }
 
     Out.write(reinterpret_cast<char*>(&*buffer.position()), bytes_to_write);

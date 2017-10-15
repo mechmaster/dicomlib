@@ -138,4 +138,9 @@ namespace dicom
 
     return (buffer.size() + 128 + 4);
   }
+  
+  DataSet FileMetaInformation::getMetaElements()
+  {
+    return m_metaElements;
+  }
 }//namespace dicom
