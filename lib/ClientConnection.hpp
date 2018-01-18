@@ -59,11 +59,8 @@ Store should be CStore, etc.
 
   class ClientConnection : public ServiceBase
   {
-    boost::scoped_ptr<Network::ClientSocket> m_socket;
 
   public:
-
-    virtual Network::Socket* GetSocket();
 
     ClientConnection(const std::string& Host, unsigned short Port, const std::string& LocalAET, const std::string& RemoteAET,
       const PresentationContexts& ProposedPresentationContexts);

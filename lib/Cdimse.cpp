@@ -32,7 +32,7 @@ See Part 8, table 9.1-5
 
     CommandSet::CEchoRSP response(msgID, classUID);
 
-    pdu.WriteCommand(response, classUID);
+    pdu.writeCommand(response, classUID);
   }
 
   void HandleCStore(CStoreFunction handler, ServiceBase& pdu, const DataSet& command, const UID& classUID)
@@ -49,7 +49,7 @@ See Part 8, table 9.1-5
     }
 
     DataSet data;
-    pdu.Read(data);//the TransferSyntax is determined internally by pdu. -Sam
+    pdu.read(data);//the TransferSyntax is determined internally by pdu. -Sam
 
     handler(pdu, command, data);//this should indicate failure via a throw...
 
@@ -58,7 +58,7 @@ See Part 8, table 9.1-5
 
     CommandSet::CStoreRSP response(msgID, classUID, instuid, Status::SUCCESS);
 
-    pdu.WriteCommand(response, classUID);
+    pdu.writeCommand(response, classUID);
   }
 
   /*
@@ -85,7 +85,7 @@ See Part 8, table 9.1-5
     }
 
     DataSet request_data;
-    pdu.Read(request_data);
+    pdu.read(request_data);
 
     Sequence Matches;
 
@@ -97,13 +97,13 @@ See Part 8, table 9.1-5
     {
       CommandSet::CFindRSP response(msgID, classUID, Status::PENDING, DataSetStatus::YES_DATA_SET);
 
-      pdu.WriteCommand(response, classUID);
-      pdu.WriteDataSet(*I, classUID);
+      pdu.writeCommand(response, classUID);
+      pdu.writeDataSet(*I, classUID);
     }
 
     CommandSet::CFindRSP response(msgID, classUID, Status::SUCCESS, DataSetStatus::NO_DATA_SET);
 
-    pdu.WriteCommand(response, classUID);
+    pdu.writeCommand(response, classUID);
   }
 
   /*
@@ -130,7 +130,7 @@ See Part 8, table 9.1-5
     }
 
     DataSet request_data;
-    pdu.Read(request_data);
+    pdu.read(request_data);
 
     //The rest part of implementation involves design of server and should be 
     //implemented in serve. -Sam
@@ -145,7 +145,7 @@ See Part 8, table 9.1-5
   void CEchoSCU::writeRQ()
   {
     CommandSet::CEchoRQ rq(getMessageID(), m_classUID);
-    m_service.WriteCommand(rq, m_classUID);
+    m_service.writeCommand(rq, m_classUID);
   }
 
   void CEchoSCU::readRSP(std::uint16_t& status)
@@ -156,7 +156,7 @@ See Part 8, table 9.1-5
 
   void CEchoSCU::readRSP(std::uint16_t& status, DataSet& response)
   {
-    m_service.Read(response);
+    m_service.read(response);
     response(TAG_STATUS) >> status;
   }
 
@@ -168,8 +168,8 @@ See Part 8, table 9.1-5
   void CStoreSCU::writeRQ(const UID& instUID, const DataSet& data, std::uint16_t priority)
   {
     CommandSet::CStoreRQ rq(getMessageID(), m_classUID, instUID, priority);
-    m_service.WriteCommand(rq, m_classUID);
-    m_service.WriteDataSet(data, m_classUID);
+    m_service.writeCommand(rq, m_classUID);
+    m_service.writeDataSet(data, m_classUID);
   }
 
   void CStoreSCU::readRSP(std::uint16_t& status) //maybe status should be a return value?TODO
@@ -180,7 +180,7 @@ See Part 8, table 9.1-5
 
   void CStoreSCU::readRSP(std::uint16_t& status, DataSet& response)
   {
-    m_service.Read(response);
+    m_service.read(response);
     response(TAG_STATUS) >> status;
   }
   //I'd prefer:
@@ -196,8 +196,8 @@ See Part 8, table 9.1-5
   void CFindSCU::writeRQ(const DataSet& data, std::uint16_t priority)
   {
     CommandSet::CFindRQ rq(getMessageID(), m_classUID, priority);
-    m_service.WriteCommand(rq, m_classUID);
-    m_service.WriteDataSet(data, m_classUID);
+    m_service.writeCommand(rq, m_classUID);
+    m_service.writeDataSet(data, m_classUID);
   }
 
   void CFindSCU::readRSP(std::uint16_t& status, DataSet& data)
@@ -214,14 +214,14 @@ See Part 8, table 9.1-5
   {
     std::uint16_t dstype = 0;
 
-    m_service.Read(response);
+    m_service.read(response);
 
     response(TAG_DATA_SET_TYPE) >> dstype;
     response(TAG_STATUS) >> status;
 
     if (dstype != DataSetStatus::NO_DATA_SET)
     {
-      m_service.Read(data);
+      m_service.read(data);
     }
   }
 
@@ -233,8 +233,8 @@ See Part 8, table 9.1-5
   void CGetSCU::writeRQ(const DataSet& data, std::uint16_t priority)
   {
     CommandSet::CGetRQ rq(getMessageID(), m_classUID, priority);
-    m_service.WriteCommand(rq, m_classUID);
-    m_service.WriteDataSet(data, m_classUID);
+    m_service.writeCommand(rq, m_classUID);
+    m_service.writeDataSet(data, m_classUID);
   }
 
   void CGetSCU::readRSP(std::uint16_t& status, DataSet&  data)
@@ -247,14 +247,14 @@ See Part 8, table 9.1-5
   {
     std::uint16_t dstype = 0;
 
-    m_service.Read(response);
+    m_service.read(response);
 
     response(TAG_DATA_SET_TYPE) >> dstype;
     response(TAG_STATUS) >> status;
 
     if (dstype != DataSetStatus::NO_DATA_SET)
     {
-      m_service.Read(data);
+      m_service.read(data);
     }
   }
 
@@ -266,8 +266,8 @@ See Part 8, table 9.1-5
   void CMoveSCU::writeRQ(const std::string& destAET, const DataSet& data, std::uint16_t priority)
   {
     CommandSet::CMoveRQ rq(getMessageID(), m_classUID, destAET, priority);
-    m_service.WriteCommand(rq, m_classUID);
-    m_service.WriteDataSet(data, m_classUID);
+    m_service.writeCommand(rq, m_classUID);
+    m_service.writeDataSet(data, m_classUID);
   }
 
   /*
@@ -285,14 +285,14 @@ See Part 8, table 9.1-5
   {
     std::uint16_t dstype = 0;
 
-    m_service.Read(response);
+    m_service.read(response);
 
     response(TAG_DATA_SET_TYPE) >> dstype;
     response(TAG_STATUS) >> status;
 
     if (dstype != DataSetStatus::NO_DATA_SET)
     {
-      m_service.Read(data);
+      m_service.read(data);
     }
   }
 }//namespace dicom

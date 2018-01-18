@@ -117,13 +117,13 @@ namespace dicom
       switch (level)
       {
       case Level::PATIENT:
-        return Level::TAG_PAT_ID;
+        return TAG_PAT_ID;
       case Level::STUDY:
-        return Level::TAG_STUDY_INST_UID;
+        return TAG_STUDY_INST_UID;
       case Level::SERIES:
-        return Level::TAG_SERIES_INST_UID;
+        return TAG_SERIES_INST_UID;
       case Level::IMAGE:
-        return Level::TAG_SOP_INST_UID;
+        return TAG_SOP_INST_UID;
       default:
         throw exception("Invalid Query/Retrieve level value.");
       }

@@ -195,29 +195,33 @@ namespace dicom
         switch(b)
         {
           case 0x50: // user information
-            std::uint32_t tmp_read = m_userInfo.readDynamic(temp);
+          {
+            std::uint32_t tmp_read = m_userInfo.read(temp);
             byteread += tmp_read;
             BytesLeftToRead -= tmp_read;//UserInfo_.Size();
-            break;
+          }
+          break;
           case 0x21:
           {
             PresentationContextAccept PresContextAccept;//should be inside loop.
-            std::uint32_t tmp_read = PresContextAccept.readDynamic(temp);
+            std::uint32_t tmp_read = PresContextAccept.read(temp);
             BytesLeftToRead -= tmp_read;//PresContextAccept.Size();
             byteread += tmp_read;
             m_presContextAccepts.push_back(PresContextAccept);
           }
           break;
           case 0x10:
-            std::uint32_t tmp_read = m_appContext.readDynamic(temp);
+          {
+            std::uint32_t tmp_read = m_appContext.read(temp);
             byteread += tmp_read;
             BytesLeftToRead -= tmp_read;//AppContext_.Size();
-            break;
+          }
+          break;
           default:
             throw BadItemType(b, 0);
         }
       }
-      
+
       return byteread;
     }
 

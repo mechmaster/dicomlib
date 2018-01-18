@@ -7,7 +7,6 @@
 *************************************************************************/
 #include <iostream>
 
-#include "socket/Socket.hpp"
 #include "UIDs.hpp"
 #include "ImplementationUID.hpp"
 #include "aarj.hpp"
@@ -31,16 +30,10 @@ and then only accepts one Transfer Syntax.  Why not support the rest?
 
 namespace dicom
 {
-  Network::Socket* ClientConnection::GetSocket()
-  {
-    return m_socket.get();
-  }
-
   ClientConnection::ClientConnection(const std::string& Host, unsigned short Port, const std::string& LocalAET,
-    const std::string& RemoteAET, const PresentationContexts& ProposedPresentationContexts) :
-    m_socket(new Network::ClientSocket(Host, Port))
+    const std::string& RemoteAET, const PresentationContexts& ProposedPresentationContexts)
   {
-    primitive::AAssociateRQ& association_request = AAssociateRQ_;//BAD BAD BAD
+    primitive::AAssociateRQ& association_request = m_aassociateRQ;//BAD BAD BAD
 
     association_request.m_callingAppTitle = LocalAET;
     association_request.m_calledAppTitle = RemoteAET;
@@ -63,24 +56,25 @@ namespace dicom
     //last bit to do is:
     primitive::UserInformation UserInfo;
     primitive::MaximumSubLength MaxSubLength;
-    MaxSubLength.set(16384); // we can do all DICOM can handle???
+    //MaxSubLength.set(16384); // we can do all DICOM can handle???
     UserInfo.m_impClass.m_UID = ImplementationClassUID;
     UserInfo.m_impVersion.m_name = ImplementationVersionName;
-    UserInfo.setMax(MaxSubLength);
+    //UserInfo.setMax(MaxSubLength);
+    UserInfo.m_maxSubLength = 16384;
 
     association_request.setUserInformation(UserInfo);
-    association_request.write(*m_socket);
+    //association_request.write(*m_socket); // <---<<<
 
     //examine response from server.
-    BYTE ItemType;
-    (*m_socket) >> ItemType;
+    std::uint8_t ItemType;
+    //(*m_socket) >> ItemType; // <---<<<
 
     switch(ItemType)
     {
       case 0x02:
         {
         primitive::AAssociateAC acknowledgement;
-        acknowledgement.readDynamic(*m_socket);
+        //acknowledgement.readDynamic(*m_socket);
 
         if(!interogateAAssociateAC(acknowledgement))
         {
@@ -92,7 +86,7 @@ namespace dicom
       case 0x03:
       {
         primitive::AAssociateRJ rejection;
-        rejection.readDynamic(*m_socket);
+        //rejection.readDynamic(*m_socket);
         throw AssociationRejection(rejection.m_result, rejection.m_source, rejection.m_reason);
       }
       default:
@@ -116,10 +110,10 @@ namespace dicom
     try
     {
       primitive::AReleaseRQ release_request;
-      release_request.write(*m_socket);
+      //release_request.write(*m_socket);
 
       primitive::AReleaseRP response;
-      response.read(*m_socket);//should we do anything with this?
+      //response.read(*m_socket);//should we do anything with this?
     }
     catch(std::exception& e)
     {
@@ -143,10 +137,10 @@ namespace dicom
   bool ClientConnection::interogateAAssociateAC(primitive::AAssociateAC& acknowledgement)
   {
     //"Accepted" means feed back from remote server. Not necessary "result is 0" -Sam
-    AcceptedPresentationContexts_ = acknowledgement.m_presContextAccepts;
+    m_acceptedPresentationContexts = acknowledgement.m_presContextAccepts;
 
     int unaccepted = std::count_if(acknowledgement.m_presContextAccepts.begin(), acknowledgement.m_presContextAccepts.end(), IsBad);
-    return (AcceptedPresentationContexts_.size() > unaccepted);
+    return (m_acceptedPresentationContexts.size() > unaccepted);
   }
 
   /*
@@ -159,25 +153,25 @@ namespace dicom
     UID instUID(data(TAG_SOP_INST_UID).Get<UID>());
 
     //Check the SOPClass in data and find the accepted transfer syntax
-    BYTE presid;
+    std::uint8_t presid;
 
     try
     {
-      presid = GetPresentationContextID(classUID);
+      presid = getPresentationContextID(classUID);
     }
     catch (dicom::exception& e)
     {
       std::cout << "In ClientConnection::Store: " << e.what() << std::endl;
     }
 
-    SetCurrentPCID(presid);
+    setCurrentPCID(presid);
 
     /*
     maybe the following could be pushed into CStoreSCU
     -after all, how else would one ever use a CStoreSCU?
     */
 
-    UINT16 status;
+    std::uint16_t status;
     DataSet response;
     CStoreSCU storeSCU(*this, classUID);
     storeSCU.writeRQ(instUID, data);
@@ -190,14 +184,14 @@ namespace dicom
     UID classUID;
     switch(root)
     {
-      case QueryRetrieve::STUDY_ROOT:
-        classUID=STUDY_ROOT_QR_MOVE_SOP_CLASS;
+      case QueryRetrieve::Root::STUDY_ROOT:
+        classUID = STUDY_ROOT_QR_MOVE_SOP_CLASS;
       break;
-      case QueryRetrieve::PATIENT_ROOT:
-        classUID=PATIENT_ROOT_QR_MOVE_SOP_CLASS;
+      case QueryRetrieve::Root::PATIENT_ROOT:
+        classUID = PATIENT_ROOT_QR_MOVE_SOP_CLASS;
       break;
-      case QueryRetrieve::PATIENT_STUDY_ONLY:
-        classUID=PATIENT_STUDY_ONLY_QR_MOVE_SOP_CLASS;
+      case QueryRetrieve::Root::PATIENT_STUDY_ONLY:
+        classUID = PATIENT_STUDY_ONLY_QR_MOVE_SOP_CLASS;
       break;
       default:
         throw dicom::exception("Unknown QR root specified.");
@@ -206,7 +200,7 @@ namespace dicom
     //build a C-MOVE identifier...
     CMoveSCU moveSCU(*this, classUID);
     moveSCU.writeRQ(destination, query);
-    UINT16 status = Status::PENDING;
+    std::uint16_t status = Status::PENDING;
     DataSet response;
 
     while (status == Status::PENDING || status == Status::PENDING1)
@@ -230,45 +224,45 @@ namespace dicom
 
     switch(root)
     {
-      case QueryRetrieve::STUDY_ROOT:
-        classUID=STUDY_ROOT_QR_FIND_SOP_CLASS;
+      case QueryRetrieve::Root::STUDY_ROOT:
+        classUID = STUDY_ROOT_QR_FIND_SOP_CLASS;
       break;
-      case QueryRetrieve::PATIENT_ROOT:
-        classUID=PATIENT_ROOT_QR_FIND_SOP_CLASS;
+      case QueryRetrieve::Root::PATIENT_ROOT:
+        classUID = PATIENT_ROOT_QR_FIND_SOP_CLASS;
       break;
-      case QueryRetrieve::PATIENT_STUDY_ONLY:
-        classUID=PATIENT_STUDY_ONLY_QR_FIND_SOP_CLASS;
+      case QueryRetrieve::Root::PATIENT_STUDY_ONLY:
+        classUID = PATIENT_STUDY_ONLY_QR_FIND_SOP_CLASS;
       break;
-      case QueryRetrieve::MODALITY_WORKLIST:
-        classUID=MODALITY_WORKLIST_SOP_CLASS;
+      case QueryRetrieve::Root::MODALITY_WORKLIST:
+        classUID = MODALITY_WORKLIST_SOP_CLASS;
       break;
-      case QueryRetrieve::GENERAL_PURPOSE_WORKLIST:
-        classUID=GENERAL_PURPOSE_WORKLIST_SOP_CLASS;
+      case QueryRetrieve::Root::GENERAL_PURPOSE_WORKLIST:
+        classUID = GENERAL_PURPOSE_WORKLIST_SOP_CLASS;
       break;
       default:
         throw dicom::exception("Unknown QR root specified.");
     }
 
     //Check the SOPClass in data and find the accepted transfer syntax
-    BYTE presid;
+    std::uint8_t presid;
     try
     {
-      presid = GetPresentationContextID(classUID);
+      presid = getPresentationContextID(classUID);
     }
     catch (dicom::exception& e)
     {
       std::cout << "In ClientConnection::Store: " << e.what() << std::endl;
     }
 
-    SetCurrentPCID(presid);
+    setCurrentPCID(presid);
 
     CFindSCU findSCU(*this, classUID);
     findSCU.writeRQ(Query);
 
-    UINT16 status = Status::PENDING;
+    std::uint16_t status = Status::PENDING;
     std::vector<DataSet> Responses;
 
-    while (status==Status::PENDING || status == Status::PENDING1)
+    while (status == Status::PENDING || status == Status::PENDING1)
     {
       DataSet response;
       DataSet data;
@@ -290,7 +284,7 @@ namespace dicom
     echoSCU.writeRQ();
 
     DataSet response;
-    UINT16 status;
+    std::uint16_t status;
 
     echoSCU.readRSP(status, response);//should we do something with status?
 
