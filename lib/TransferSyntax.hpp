@@ -1,30 +1,32 @@
-#ifndef TS_HPP_INCLUDE_GUARD_48824554
-#define TS_HPP_INCLUDE_GUARD_48824554
+#pragma once
 
 #include <string>
+
 #include "UID.hpp"
+
 namespace dicom
 {
+  //!Allows quick access to attributes of a given transfer syntax.
+  /*!
+  Part 5, Section 10 describes Transfer Syntaxes.
+  */
 
-	//!Allows quick access to attributes of a given transfer syntax.
-	/*!
-		Part 5, Section 10 describes Transfer Syntaxes.
-	*/
-	class TS//don't like this name. - we should rename it "TransferSyntax", (as distinct from primitive::TransferSyntax !)
-	{
+  class TS //don't like this name. - we should rename it "TransferSyntax", (as distinct from primitive::TransferSyntax !)
+  {
 
-	public:
+  public:
 
-		TS(const UID& uid);
+    TS(const UID& uid);
 
-		bool isExplicitVR() const;
-		bool isBigEndian() const;
-		bool isDeflated() const;
-		bool isEncapsulated() const;
+    bool isExplicitVR() const;
+    bool isBigEndian() const;
+    bool isDeflated() const;
+    bool isEncapsulated() const;
 
-		UID getUID() const;
-	private:
-		const UID uid_;
-	};
+    UID getUID() const;
+
+  private:
+
+    const UID m_uid;
+  };
 }//namespace dicom
-#endif //TS_HPP_INCLUDE_GUARD_48824554
