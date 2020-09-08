@@ -56,13 +56,13 @@ namespace dicom
     
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      this->push_back(data >> 8);
-      this->push_back(data);
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data));
     }
     else
     {
-      this->push_back(data);
-      this->push_back(data >> 8);    
+      this->push_back(static_cast<std::uint8_t>(data));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
     }
 
     return *this;
@@ -74,22 +74,22 @@ namespace dicom
     {
       return *this;
     }
-    
+
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      this->push_back(data >> 24);
-      this->push_back(data >> 16);
-      this->push_back(data >> 8);
-      this->push_back(data);
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data));
     }
     else
     {
-      this->push_back(data);
-      this->push_back(data >> 8);
-      this->push_back(data >> 16);
-      this->push_back(data >> 24);
+      this->push_back(static_cast<std::uint8_t>(data));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
     }
-    
+
     return *this;
   }
 
@@ -102,25 +102,25 @@ namespace dicom
     
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      this->push_back(data >> 56);
-      this->push_back(data >> 48);
-      this->push_back(data >> 40);
-      this->push_back(data >> 32);
-      this->push_back(data >> 24);
-      this->push_back(data >> 16);
-      this->push_back(data >> 8);
-      this->push_back(data);
+      this->push_back(static_cast<std::uint8_t>(data >> 56));
+      this->push_back(static_cast<std::uint8_t>(data >> 48));
+      this->push_back(static_cast<std::uint8_t>(data >> 40));
+      this->push_back(static_cast<std::uint8_t>(data >> 32));
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data));
     }
     else
     {
-      this->push_back(data);
-      this->push_back(data >> 8);
-      this->push_back(data >> 16);
-      this->push_back(data >> 24);
-      this->push_back(data >> 32);
-      this->push_back(data >> 40);
-      this->push_back(data >> 48);
-      this->push_back(data >> 56);
+      this->push_back(static_cast<std::uint8_t>(data));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
+      this->push_back(static_cast<std::uint8_t>(data >> 32));
+      this->push_back(static_cast<std::uint8_t>(data >> 40));
+      this->push_back(static_cast<std::uint8_t>(data >> 48));
+      this->push_back(static_cast<std::uint8_t>(data >> 56));
     }
     
     return *this;
@@ -144,18 +144,18 @@ namespace dicom
     {
       return *this;
     }
-    
+
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      this->push_back(data >> 8);
-      this->push_back(data);
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data));
     }
     else
     {
-      this->push_back(data);
-      this->push_back(data >> 8);      
+      this->push_back(static_cast<std::uint8_t>(data));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
     }
-    
+
     return *this;
   }
 
@@ -168,17 +168,17 @@ namespace dicom
     
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      this->push_back(data >> 24);
-      this->push_back(data >> 16);
-      this->push_back(data >> 8);
-      this->push_back(data);
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data));
     }
     else
     {
-      this->push_back(data);
-      this->push_back(data >> 8);
-      this->push_back(data >> 16);
-      this->push_back(data >> 24);
+      this->push_back(static_cast<std::uint8_t>(data));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
     }
     
     return *this;
@@ -193,25 +193,25 @@ namespace dicom
     
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      this->push_back(data >> 56);
-      this->push_back(data >> 48);
-      this->push_back(data >> 40);
-      this->push_back(data >> 32);
-      this->push_back(data >> 24);
-      this->push_back(data >> 16);
-      this->push_back(data >> 8);
-      this->push_back(data);
+      this->push_back(static_cast<std::uint8_t>(data >> 56));
+      this->push_back(static_cast<std::uint8_t>(data >> 48));
+      this->push_back(static_cast<std::uint8_t>(data >> 40));
+      this->push_back(static_cast<std::uint8_t>(data >> 32));
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data));
     }
     else
     {
-      this->push_back(data);
-      this->push_back(data >> 8);
-      this->push_back(data >> 16);
-      this->push_back(data >> 24);
-      this->push_back(data >> 32);
-      this->push_back(data >> 40);
-      this->push_back(data >> 48);
-      this->push_back(data >> 56);
+      this->push_back(static_cast<std::uint8_t>(data));
+      this->push_back(static_cast<std::uint8_t>(data >> 8));
+      this->push_back(static_cast<std::uint8_t>(data >> 16));
+      this->push_back(static_cast<std::uint8_t>(data >> 24));
+      this->push_back(static_cast<std::uint8_t>(data >> 32));
+      this->push_back(static_cast<std::uint8_t>(data >> 40));
+      this->push_back(static_cast<std::uint8_t>(data >> 48));
+      this->push_back(static_cast<std::uint8_t>(data >> 56));
     }
     
     return *this;
@@ -284,12 +284,12 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 1)
+    if (this->size() - m_currentIndex < 1)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
 
-    data = this->front();
+    data = this->operator[](m_currentIndex);
 
     m_currentIndex += 1;
 
@@ -303,7 +303,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 2)
+    if (this->size() - m_currentIndex < 2)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -311,13 +311,13 @@ namespace dicom
     data = 0;
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      data |= (this->operator[](0) << 8);
-      data |= this->operator[](1);
+      data |= (this->operator[](m_currentIndex + 0) << 8);
+      data |= this->operator[](m_currentIndex + 1);
     }
     else
     {
-      data |= (this->operator[](1) << 8);
-      data |= this->operator[](0);
+      data |= (this->operator[](m_currentIndex + 1) << 8);
+      data |= this->operator[](m_currentIndex + 0);
     }
     
     m_currentIndex += 2;
@@ -332,7 +332,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 4)
+    if (this->size() - m_currentIndex < 4)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -340,17 +340,17 @@ namespace dicom
     data = 0;
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      data |= (this->operator[](0) << 24);
-      data |= (this->operator[](1) << 16);
-      data |= (this->operator[](2) << 8);
-      data |= this->operator[](3);
+      data |= (this->operator[](m_currentIndex + 0) << 24);
+      data |= (this->operator[](m_currentIndex + 1) << 16);
+      data |= (this->operator[](m_currentIndex + 2) << 8);
+      data |= this->operator[](m_currentIndex + 3);
     }
     else
     {
-      data |= (this->operator[](3) << 24);
-      data |= (this->operator[](2) << 16);
-      data |= (this->operator[](1) << 8);
-      data |= this->operator[](0);
+      data |= (this->operator[](m_currentIndex + 3) << 24);
+      data |= (this->operator[](m_currentIndex + 2) << 16);
+      data |= (this->operator[](m_currentIndex + 1) << 8);
+      data |= this->operator[](m_currentIndex + 0);
     }
     
     m_currentIndex += 4;
@@ -365,7 +365,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 8)
+    if (this->size() - m_currentIndex < 8)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -373,25 +373,25 @@ namespace dicom
     data = 0;
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      data |= (this->operator[](0) << 56);
-      data |= (this->operator[](1) << 48);
-      data |= (this->operator[](2) << 40);
-      data |= (this->operator[](3) << 32);
-      data |= (this->operator[](4) << 24);
-      data |= (this->operator[](5) << 16);
-      data |= (this->operator[](6) << 8);
-      data |= this->operator[](7);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 0)) << 56);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 1)) << 48);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 2)) << 40);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 3)) << 32);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 4)) << 24);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 5)) << 16);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 6)) << 8);
+      data |= static_cast<uint64_t>(this->operator[](m_currentIndex + 7));
     }
     else
     {
-      data |= (this->operator[](7) << 56);
-      data |= (this->operator[](6) << 48);
-      data |= (this->operator[](5) << 40);
-      data |= (this->operator[](4) << 32);
-      data |= (this->operator[](3) << 24);
-      data |= (this->operator[](2) << 16);
-      data |= (this->operator[](1) << 8);
-      data |= this->operator[](0);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 7)) << 56);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 6)) << 48);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 5)) << 40);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 4)) << 32);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 3)) << 24);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 2)) << 16);
+      data |= (static_cast<uint64_t>(this->operator[](m_currentIndex + 1)) << 8);
+      data |= static_cast<uint64_t>(this->operator[](m_currentIndex + 0));
     }
     
     m_currentIndex += 8;
@@ -406,12 +406,12 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 1)
+    if (this->size() - m_currentIndex < 1)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
     
-    data = this->front();
+    data = this->operator[](m_currentIndex);
     
     m_currentIndex += 1;
     
@@ -425,7 +425,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 2)
+    if (this->size() - m_currentIndex < 2)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -433,13 +433,13 @@ namespace dicom
     data = 0;
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      data |= (this->operator[](0) << 8);
-      data |= this->operator[](1);
+      data |= (this->operator[](m_currentIndex + 0) << 8);
+      data |= this->operator[](m_currentIndex + 1);
     }
     else
     {
-      data |= (this->operator[](1) << 8);
-      data |= this->operator[](0);
+      data |= (this->operator[](m_currentIndex + 1) << 8);
+      data |= this->operator[](m_currentIndex + 0);
     }
     
     m_currentIndex += 2;
@@ -454,7 +454,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 4)
+    if (this->size() - m_currentIndex < 4)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -462,17 +462,17 @@ namespace dicom
     data = 0;
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      data |= (this->operator[](0) << 24);
-      data |= (this->operator[](1) << 16);
-      data |= (this->operator[](2) << 8);
-      data |= this->operator[](3);
+      data |= (this->operator[](m_currentIndex + 0) << 24);
+      data |= (this->operator[](m_currentIndex + 1) << 16);
+      data |= (this->operator[](m_currentIndex + 2) << 8);
+      data |= this->operator[](m_currentIndex + 3);
     }
     else
     {
-      data |= (this->operator[](3) << 24);
-      data |= (this->operator[](2) << 16);
-      data |= (this->operator[](1) << 8);
-      data |= this->operator[](0);
+      data |= (this->operator[](m_currentIndex + 3) << 24);
+      data |= (this->operator[](m_currentIndex + 2) << 16);
+      data |= (this->operator[](m_currentIndex + 1) << 8);
+      data |= this->operator[](m_currentIndex + 0);
     }
     
     m_currentIndex += 4;
@@ -487,7 +487,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 8)
+    if (this->size() - m_currentIndex < 8)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -495,25 +495,25 @@ namespace dicom
     data = 0;
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      data |= (this->operator[](0) << 56);
-      data |= (this->operator[](1) << 48);
-      data |= (this->operator[](2) << 40);
-      data |= (this->operator[](3) << 32);
-      data |= (this->operator[](4) << 24);
-      data |= (this->operator[](5) << 16);
-      data |= (this->operator[](6) << 8);
-      data |= this->operator[](7);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 0)) << 56);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 1)) << 48);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 2)) << 40);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 3)) << 32);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 4)) << 24);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 5)) << 16);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 6)) << 8);
+      data |= static_cast<int64_t>(this->operator[](m_currentIndex + 7));
     }
     else
     {
-      data |= (this->operator[](7) << 56);
-      data |= (this->operator[](6) << 48);
-      data |= (this->operator[](5) << 40);
-      data |= (this->operator[](4) << 32);
-      data |= (this->operator[](3) << 24);
-      data |= (this->operator[](2) << 16);
-      data |= (this->operator[](1) << 8);
-      data |= this->operator[](0);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 7)) << 56);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 6)) << 48);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 5)) << 40);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 4)) << 32);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 3)) << 24);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 2)) << 16);
+      data |= (static_cast<int64_t>(this->operator[](m_currentIndex + 1)) << 8);
+      data |= static_cast<int64_t>(this->operator[](m_currentIndex + 0));
     }
     
     m_currentIndex += 8;
@@ -528,7 +528,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 4)
+    if (this->size() - m_currentIndex < 4)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -536,17 +536,17 @@ namespace dicom
     std::uint8_t* pData = reinterpret_cast<std::uint8_t*>(&data);
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      pData[0] = this->operator[](0);
-      pData[1] = this->operator[](1);
-      pData[2] = this->operator[](2);
-      pData[3] = this->operator[](3);
+      pData[0] = this->operator[](m_currentIndex + 0);
+      pData[1] = this->operator[](m_currentIndex + 1);
+      pData[2] = this->operator[](m_currentIndex + 2);
+      pData[3] = this->operator[](m_currentIndex + 3);
     }
     else
     {
-      pData[3] = this->operator[](3);
-      pData[2] = this->operator[](2);
-      pData[1] = this->operator[](1);
-      pData[0] = this->operator[](0);
+      pData[3] = this->operator[](m_currentIndex + 3);
+      pData[2] = this->operator[](m_currentIndex + 2);
+      pData[1] = this->operator[](m_currentIndex + 1);
+      pData[0] = this->operator[](m_currentIndex + 0);
     }
     
     m_currentIndex += 4;
@@ -561,7 +561,7 @@ namespace dicom
       return *this;
     }
     
-    if (this->size() - (m_currentIndex + 1) < 8)
+    if (this->size() - m_currentIndex < 8)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -569,25 +569,25 @@ namespace dicom
     std::uint8_t* pData = reinterpret_cast<std::uint8_t*>(&data);
     if (m_externalByteOrder == __BYTE_ORDER)
     {
-      pData[0] = this->operator[](0);
-      pData[1] = this->operator[](1);
-      pData[2] = this->operator[](2);
-      pData[3] = this->operator[](3);
-      pData[0] = this->operator[](4);
-      pData[1] = this->operator[](5);
-      pData[2] = this->operator[](6);
-      pData[3] = this->operator[](7);
+      pData[0] = this->operator[](m_currentIndex + 0);
+      pData[1] = this->operator[](m_currentIndex + 1);
+      pData[2] = this->operator[](m_currentIndex + 2);
+      pData[3] = this->operator[](m_currentIndex + 3);
+      pData[0] = this->operator[](m_currentIndex + 4);
+      pData[1] = this->operator[](m_currentIndex + 5);
+      pData[2] = this->operator[](m_currentIndex + 6);
+      pData[3] = this->operator[](m_currentIndex + 7);
     }
     else
     {
-      pData[3] = this->operator[](7);
-      pData[2] = this->operator[](6);
-      pData[1] = this->operator[](5);
-      pData[0] = this->operator[](4);
-      pData[3] = this->operator[](3);
-      pData[2] = this->operator[](2);
-      pData[1] = this->operator[](1);
-      pData[0] = this->operator[](0);
+      pData[3] = this->operator[](m_currentIndex + 7);
+      pData[2] = this->operator[](m_currentIndex + 6);
+      pData[1] = this->operator[](m_currentIndex + 5);
+      pData[0] = this->operator[](m_currentIndex + 4);
+      pData[3] = this->operator[](m_currentIndex + 3);
+      pData[2] = this->operator[](m_currentIndex + 2);
+      pData[1] = this->operator[](m_currentIndex + 1);
+      pData[0] = this->operator[](m_currentIndex + 0);
     }
     
     m_currentIndex += 8;
@@ -610,7 +610,7 @@ namespace dicom
       return *this;
     }
 
-    if (data.size() > (end() - position()))
+    if (data.size() > static_cast<size_t>(std::distance(position(), end())))
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -618,6 +618,11 @@ namespace dicom
     data.assign(position(), position() + data.size());
 
     m_currentIndex += data.size();
+    
+    if (m_externalByteOrder != __BYTE_ORDER)
+    {
+      std::reverse(std::begin(data), std::end(data));
+    }
 
     return *this;
   }
@@ -629,7 +634,7 @@ namespace dicom
       return *this;
     }
 
-    if((data.size() * 2) > (end() - position()))
+    if((data.size() * 2) > static_cast<size_t>(std::distance(position(), end())))
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -642,20 +647,19 @@ namespace dicom
     {
       std::reverse(std::begin(data), std::end(data));
     }
-
     return *this;
   }
 
   Buffer& Buffer::operator >> (std::string& data)
   {
-    if(data.size() > (end() - position()))
+    if(data.size() > static_cast<size_t>(std::distance(position(), end())))
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
     
     for (unsigned int i = 0; i < data.size(); ++i)
     {
-      data[i] = this->operator[](i);
+      data[i] = this->operator[](m_currentIndex + i);
     }
     
     m_currentIndex += data.size();
@@ -665,7 +669,7 @@ namespace dicom
 
   Buffer& Buffer::operator >> (Tag& tag)
   {
-    if(this->size() - (m_currentIndex + 1) < 4)
+    if(this->size() - m_currentIndex < 4)
     {
       throw ReadBeyondBuffer("Attempting to read beyond end of buffer");
     }
@@ -683,9 +687,13 @@ namespace dicom
 
   Buffer& Buffer::operator << (std::string data)
   {
+    std::size_t count = this->size();
+    this->resize(count + data.size());
+  
     for (unsigned int i = 0; i < data.size(); ++i)
     {
-      this->operator[](i) = data[i];
+      std::size_t currentPos = count + i;
+      this->operator[](currentPos) = data[i];
     }
 
     return *this;
