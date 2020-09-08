@@ -1,11 +1,3 @@
-/************************************************************************
-* DICOMLIB
-* Copyright 2003 Sunnybrook and Women's College Health Science Center
-* Implemented by Trevor Morgan  (morgan@sten.sunnybrook.utoronto.ca)
-*
-* See LICENSE.txt for copyright and licensing info.
-*************************************************************************/
-
 #include <algorithm>
 #include <cctype>
 

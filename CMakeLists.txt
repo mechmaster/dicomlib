@@ -72,7 +72,15 @@ cmake_minimum_required(VERSION 2.8)
 project(dicomlib)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOMOC ON)
+
+set(Boost_NO_SYSTEM_PATHS        OFF)
+set(Boost_NO_BOOST_CMAKE         ON)
+set(Boost_USE_STATIC_LIBS        OFF)  # only find static libs
+set(Boost_USE_DEBUG_LIBS         OFF) # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
 
 find_package(Boost 1.60.0 REQUIRED COMPONENTS thread system date_time filesystem)
 #find_package(FLTK REQUIRED)
